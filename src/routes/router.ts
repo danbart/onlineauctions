@@ -12,12 +12,12 @@ const router = Router();
 
 // ================= get / =======================
 router.get(
-  "/usuario/",
+  "/user/",
   /*verificaToken,*/ async (req: Request, res: Response) => {
     const query = usuariosConectados.getLista();
 
     try {
-      MySql.ejecutarQuery(query, (err: any, usuarios: ModelUser[]) => {
+      await MySql.executeQuery(query, (err: any, usuarios: ModelUser[]) => {
         if (err) {
           res.json({
             ok: false,
@@ -58,7 +58,7 @@ router.post(
     // server.io.emit('mensaje-nuevo', payload);
     const query = usuariosConectados.agregar(user);
 
-    MySql.ejecutarQuery(query, (err: any, usuario: any) => {
+    MySql.executeQuery(query, (err: any, usuario: any) => {
       if (!!usuario) {
         res.json({
           ok: true,
@@ -82,7 +82,7 @@ router.get("/user/:id", async (req: Request, res: Response) => {
     const query = usuariosConectados.getLista(Number(id));
 
     try {
-      MySql.ejecutarQuery(query, (err: any, usuarios: ModelUser[]) => {
+      MySql.executeQuery(query, (err: any, usuarios: ModelUser[]) => {
         if (err) {
           res.json({
             ok: false,
