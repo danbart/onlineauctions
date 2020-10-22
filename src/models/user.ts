@@ -11,7 +11,7 @@ export class ModelUser {
   public phone: string;
   public web_site: string;
   public facebook: string;
-  public twitteer: string;
+  public twitter: string;
   public remember_token: string;
   public created_at: string;
   public updated_at: string;
@@ -28,7 +28,7 @@ export class ModelUser {
     this.phone = "";
     this.web_site = "";
     this.facebook = "";
-    this.twitteer = "";
+    this.twitter = "";
     this.remember_token = "";
     this.password = "";
     this.created_at = "";
