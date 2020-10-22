@@ -15,3 +15,11 @@ Run server
 ```
 yarn start:debug
 ```
+
+---
+
+Author: Danilo Solórzano [danbar](https://danbart.github.io/)
+proyect: 'Online Autcion'
+Year: 2020
+
+---
