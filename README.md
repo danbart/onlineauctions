@@ -1,22 +1,17 @@
-# Webserver para api rest con sockets
+# Online vehicle auction sales application
 
- * Aplicación de node con [sockets.io](https://socket.io/)
- * Conexión a base de datos [MySql](https://github.com/mysqljs/mysq)
- * Generador de contraseña con [Jwt](https://jwt.io/)
+- Node application with [sockets.io](https://socket.io/)
+- Database connection [MySql](https://github.com/mysqljs/mysq)
+- Token generator with [Jwt](https://jwt.io/)
 
-Recosntruir modulos de node
-```
-npm install
-```
+Re-building node modules
 
-Generar DIST
 ```
-tsc -w
+yarn install
 ```
 
-Levantar servidor, cualqueira de los dos comandos
-```
-nodemon dist/
-node dist/
-```
+Run server
 
+```
+yarn start:debug
+```
