@@ -5,6 +5,7 @@ import {
   SERVER_USER,
 } from "../global/environment";
 import mysql = require("mysql");
+import util  from 'util'
 
 export default class MySql {
   private static _instance: MySql;
@@ -30,20 +31,9 @@ export default class MySql {
   }
 
   // funcion par ahacer consultas
-  static executeQuery(query: string, callback: Function) {
-    return this.instances.cnn.query(query, (err, results: Object[], fields) => {
-      if (err) {
-        console.log("Error en query");
-        console.log(err);
-        return callback(err);
-      }
-
-      if (results.length === 0) {
-        callback("El registro solicitado no existe");
-      } else {
-        callback(null, results);
-      }
-    });
+  static async executeQuery(query: string) {
+    return util.promisify(this.instances.cnn.query)
+    .call(this.instances.cnn, query);
   }
 
   // conectar base de datos

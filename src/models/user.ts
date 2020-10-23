@@ -2,7 +2,7 @@ export class ModelUser {
   public id_user: number;
   public name: string;
   public last_name: string;
-  public active: boolean;
+  public active: string;
   public avatar: string;
   public email: string;
   public password: string;
@@ -19,7 +19,7 @@ export class ModelUser {
     this.id_user = 0;
     this.name = "";
     this.last_name = "";
-    this.active = true;
+    this.active = "";
     this.avatar = "";
     this.email = "";
     this.addres = "";
