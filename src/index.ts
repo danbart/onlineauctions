@@ -3,7 +3,7 @@ import cors from "cors";
 import { Request, Response } from "express";
 import { ValidationError } from "express-validation";
 import * as pkg from "../package.json";
-import { createRoles } from "./lib/initialSetup";
+import { createAdmin, createRoles } from "./lib/initialSetup";
 import MySql from "./mysql/mysql";
 import router from "./routes/router";
 import Server from "./server/server";
@@ -13,6 +13,7 @@ const server = Server.instance;
 // Mysql
 MySql.instances;
 createRoles();
+createAdmin();
 
 // BodyPArser
 server.app.use(bodyParser.urlencoded({ extended: true }));

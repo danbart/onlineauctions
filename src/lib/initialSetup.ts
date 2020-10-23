@@ -4,66 +4,50 @@ import { ModelUser } from "../models/user";
 import MySql from "../mysql/mysql";
 
 export const createRoles = async () => {
-  try {
-    let count: ModelRole[] = [];
+  let count: ModelRole[] = [];
 
-    await MySql.executeQuery(
-      `SELECT * FROM role`,
-      (err: any, role: ModelRole[]) => {
-        if (!err) count = role;
-      }
-    );
+  await MySql.executeQuery(`SELECT * FROM role`)
+    .then((data: any) => (count = data))
+    .catch(console.log);
 
-    // TODO: corregir error
-    console.log(count);
+  if (count.length > 0) return;
 
-    if (count.length > 0) return;
+  const query = `INSERT INTO role(role) VALUES("admin"),("register"),("users")`;
 
-    const query = `INSERT INTO role(role) VALUES("admin"),("register"),("user")`;
-
-    await MySql.executeQuery(query, (err: any, resp: any) => {
-      if (!!resp) count = resp.insertId;
-    });
-
-    console.log(count);
-  } catch (error) {
-    return error;
-  }
+  return await MySql.executeQuery(query).then(console.log);
 };
 
 export const createAdmin = async () => {
-  let user: ModelUser[] = [];
+  let users: ModelUser[] = [];
   let rol: ModelRole[] = [];
 
   await MySql.executeQuery(
-    `SELECT * FROM role where role="admin" || role="register";`,
-    (err: any, role: ModelRole[]) => {
-      if (!err) rol = role;
-    }
-  );
+    `SELECT * FROM role where role="admin" || role="register";`
+  ).then((data: any) => (rol = data));
 
   if (rol.length === 0) return;
 
   await MySql.executeQuery(
-    `SELECT * FROM user where email="admin@localhost" limit 1;`,
-    (err: any, admin: ModelUser[]) => {
-      if (!err) user = admin;
-    }
-  );
+    `SELECT * FROM user where email="admin@localhost" limit 1;`
+  ).then((data: any) => (users = data));
 
-  if (user.length === 0) {
+  if (users.length === 0) {
     const admin = new ModelUser();
     admin.email = "admin@localhost";
     admin.name = "admin";
+    admin.active = new Date().toJSON().slice(0, 19).replace("T", " ");
     admin.password = await bcrypt.hash("admin", 10);
 
     await MySql.executeQuery(
-      `INSERT INTO (name, email, password) VALUES (name="${admin.name}",email="${admin.email}", password="${admin.password}" );`,
-      (err: any, resp: any) => {
-        if (!!resp) admin.id_user = resp.insertId;
-      }
-    );
+      `INSERT INTO user(name, email,active, password) VALUES ("${admin.name}","${admin.email}", "${admin.active}","${admin.password}" );`
+    )
+      .then((data: any) => {
+        rol.forEach(async (val: ModelRole) => {
+          await MySql.executeQuery(
+            `INSERT INTO role_user(id_user,id_role) VALUES("${data.insertId}", "${val.id_role}")`
+          );
+        });
+      })
+      .catch(console.log);
   }
-
-  return;
 };
