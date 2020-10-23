@@ -1,4 +1,7 @@
+import { Request, Response } from "express";
 import { ModelUser } from "../models/user";
+import MySql from "../mysql/mysql";
+import { IResponse } from "./interface/IResponse";
 
 export class User {
   private lista: ModelUser[] = [];
@@ -51,4 +54,25 @@ export class User {
     // this.lista = this.lista.filter( usuario => usuario.id !== id );
     // return tempUsuario;
   }
+
+  getUsers = async (req: Request, res: Response) => {
+    const query = `
+      SELECT * FROM user
+    `;
+    const result: IResponse = {
+      ok: false,
+    };
+
+    await MySql.executeQuery(query, (err: any, users: ModelUser[]) => {
+      if (err) {
+        result.ok = false;
+        result.error = err;
+      } else {
+        result.ok = true;
+        result.data = users;
+      }
+    });
+
+    res.json(result);
+  };
 }

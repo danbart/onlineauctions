@@ -7,34 +7,36 @@ import { ModelUser } from "../models/user";
 import MySql from "../mysql/mysql";
 import Server from "../server/server";
 import { usuariosConectados } from "../sockets/socket";
+import { routeUser } from "./user.route";
 
 const router = Router();
 
+router.use("/user/", routeUser);
 // ================= get / =======================
-router.get(
-  "/user/",
-  /*verificaToken,*/ async (req: Request, res: Response) => {
-    const query = usuariosConectados.getLista();
+// router.get(
+//   "/user/",
+//   /*verificaToken,*/ async (req: Request, res: Response) => {
+//     const query = usuariosConectados.getLista();
 
-    try {
-      await MySql.executeQuery(query, (err: any, usuarios: ModelUser[]) => {
-        if (err) {
-          res.json({
-            ok: false,
-            error: err,
-          });
-        } else {
-          res.json({
-            ok: true,
-            user: usuarios,
-          });
-        }
-      });
-    } catch (error) {
-      return error.sqlMessage;
-    }
-  }
-);
+//     try {
+//       await MySql.executeQuery(query, (err: any, usuarios: ModelUser[]) => {
+//         if (err) {
+//           res.json({
+//             ok: false,
+//             error: err,
+//           });
+//         } else {
+//           res.json({
+//             ok: true,
+//             user: usuarios,
+//           });
+//         }
+//       });
+//     } catch (error) {
+//       return error.sqlMessage;
+//     }
+//   }
+// );
 // TODO: validar el email
 router.post(
   "/user/",
