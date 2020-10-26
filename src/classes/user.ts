@@ -7,6 +7,7 @@ import { ModelRole } from "../models/role";
 import { ModelUser } from "../models/user";
 import MySql from "../mysql/mysql";
 import { IResponse } from "./interface/IResponse";
+import { userLogin } from '../utils/jwt';
 
 export class User {
   private lista: ModelUser[] = [];
@@ -42,7 +43,11 @@ export class User {
       ok: false,
     };
 
-    const userId = req.params.id;
+    let userId = req.params.id;
+
+    if(!userId){
+      await userLogin(req).then(res => userId = res);
+    }
 
     let users: ModelUser[] = [];
 
@@ -234,9 +239,10 @@ export class User {
         }
       );
       result.data = [{ token: token }];
+      result.ok = true;
     } else {
       result.error = { message: "Usuario y Contraseña erroneo" };
-      return res.json(result);
     }
+    return res.json(result);
   };
 }
