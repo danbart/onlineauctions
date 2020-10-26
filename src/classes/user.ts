@@ -1,6 +1,8 @@
 import PhoneNumber from "awesome-phonenumber";
 import bcrypt from "bcrypt";
 import { Request, Response } from "express";
+import jwt from "jsonwebtoken";
+import { CADUCIDAD_TOKEN, SEED } from "../global/environment";
 import { ModelRole } from "../models/role";
 import { ModelUser } from "../models/user";
 import MySql from "../mysql/mysql";
@@ -215,7 +217,7 @@ export class User {
     let users: ModelUser[] = [];
 
     await MySql.executeQuery(
-      `SELECT email, password FROM user where email="${user.email}" limit 1;`
+      `SELECT id_user, email, password FROM user where email="${user.email}" limit 1;`
     ).then((data: any) => (users = data));
 
     if (users.length === 0) {
@@ -223,23 +225,18 @@ export class User {
       return res.json(result);
     }
 
-    try {
-      await MySql.executeQuery(
-        `UPDATE user SET name="${user.name}",last_name="${user.last_name}", address="${user.addres}",phone="${user.phone}",avatar="${user.avatar}",
-        web_site="${user.web_site}",facebook="${user.facebook}",twitter="${user.twitter}" where id_user=${userId};`
-      )
-        .then((data: any) => {
-          result.ok = true;
-          result.data = [{ message: data.message }];
-        })
-        .catch((err) => {
-          result.ok = false;
-          result.error = err;
-        });
-
-      res.json(result);
-    } catch (error) {
-      console.log(error);
+    if (await bcrypt.compare(user.password, Object.values(users)[0].password)) {
+      const token = await jwt.sign(
+        { id: Object.values(users)[0].id_user },
+        Buffer.from(SEED, "base64"),
+        {
+          expiresIn: CADUCIDAD_TOKEN,
+        }
+      );
+      result.data = [{ token: token }];
+    } else {
+      result.error = { message: "Usuario y Contraseña erroneo" };
+      return res.json(result);
     }
   };
 }
