@@ -1,32 +1,14 @@
-import { Request, Response, Router } from "express";
-// clases
-import { ModelUser } from "../models/user";
+import { Router } from "express";
+import { validate } from "express-validation";
+import { User } from "../classes/user";
+import {
+  userValidator,
+  userValidatorLogin,
+} from "../middlewares/validatorsUser";
 
 export const routerLogin = Router();
+const user = new User();
 
-routerLogin.post("/register", (req: Request, res: Response) => {
-  const body = req.body;
+routerLogin.post("/register", validate(userValidator), user.postUser);
 
-  const usuario = new ModelUser();
-
-  usuario.email = req.body.email;
-});
-
-// router.get('/', verificaToken, (req: Request, res: Response) => {
-
-//     const query = `SELECT * FROM test_user`;
-
-//     MySql.ejecutarQuery(query, (err: any, usuarios: Object[]) => {
-//         if ( err ) {
-//             res.status(400).json({
-//                 ok: false,
-//                 error: err
-//             });
-//         } else {
-//             res.json({
-//                 ok: true,
-//                 usuarios
-//             })
-//         }
-//     });
-// });
+routerLogin.post("/login", validate(userValidatorLogin), user.loginUser);
