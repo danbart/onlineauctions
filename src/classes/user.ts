@@ -6,8 +6,8 @@ import { CADUCIDAD_TOKEN, SEED } from "../global/environment";
 import { ModelRole } from "../models/role";
 import { ModelUser } from "../models/user";
 import MySql from "../mysql/mysql";
+import { userLogin } from "../utils/jwt";
 import { IResponse } from "./interface/IResponse";
-import { userLogin } from '../utils/jwt';
 
 export class User {
   private lista: ModelUser[] = [];
@@ -29,7 +29,7 @@ export class User {
         })
         .catch((err) => {
           result.ok = false;
-          result.error = err;
+          result.error = err.sqlMessage;
         });
 
       res.json(result);
@@ -45,8 +45,8 @@ export class User {
 
     let userId = req.params.id;
 
-    if(!userId){
-      await userLogin(req).then(res => userId = res);
+    if (!userId) {
+      await userLogin(req).then((res) => (userId = res));
     }
 
     let users: ModelUser[] = [];
@@ -70,7 +70,7 @@ export class User {
         })
         .catch((err) => {
           result.ok = false;
-          result.error = err;
+          result.error = err.sqlMessage;
         });
 
       res.json(result);
@@ -148,7 +148,7 @@ export class User {
         })
         .catch((err) => {
           result.ok = false;
-          result.error = err;
+          result.error = err.sqlMessage;
         });
 
       res.json(result);
@@ -164,7 +164,11 @@ export class User {
       ok: false,
     };
 
-    const userId = req.params.id;
+    let userId = req.params.id;
+
+    if (!userId) {
+      await userLogin(req).then((res) => (userId = res));
+    }
 
     let users: ModelUser[] = [];
 
@@ -200,7 +204,7 @@ export class User {
         })
         .catch((err) => {
           result.ok = false;
-          result.error = err;
+          result.error = err.sqlMessage;
         });
 
       res.json(result);

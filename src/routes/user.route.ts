@@ -3,8 +3,8 @@ import { validate } from "express-validation";
 import { User } from "../classes/user";
 import {
   isAdmin,
-  verificaToken,
   isRegister,
+  verificaToken,
 } from "../middlewares/autentication";
 import {
   userValidator,
@@ -21,6 +21,11 @@ routeUser.post(
   "/",
   [verificaToken, isRegister, validate(userValidator)],
   user.postUser
+);
+routeUser.put(
+  "/profile",
+  [verificaToken, validate(userValidatorUpdate)],
+  user.putUser
 );
 routeUser.put(
   "/:id",
