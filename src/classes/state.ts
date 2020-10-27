@@ -89,7 +89,7 @@ export class State {
       )
         .then((data: any) => {
           result.ok = true;
-          result.data = [{ userId: data.insertId }];
+          result.data = [{ stateId: data.insertId }];
         })
         .catch((err) => {
           result.ok = false;

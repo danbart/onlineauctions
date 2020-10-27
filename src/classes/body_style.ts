@@ -89,7 +89,7 @@ export class BodyStyle {
       )
         .then((data: any) => {
           result.ok = true;
-          result.data = [{ userId: data.insertId }];
+          result.data = [{ bodyStyleId: data.insertId }];
         })
         .catch((err) => {
           result.ok = false;
