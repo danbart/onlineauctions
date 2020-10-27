@@ -11,3 +11,9 @@ export const bodyStyleValidator = {
     style: Joi.string().required(),
   }),
 };
+
+export const typeValidator = {
+  body: Joi.object({
+    type: Joi.string().required(),
+  }),
+};
