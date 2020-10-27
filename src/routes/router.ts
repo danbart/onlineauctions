@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { routerbodyStyle } from "./bodyStyle.route";
+import { routerbodyStyle } from "./bodyStyle.router";
 import { routerLogin } from "./login.router";
-import { routeState } from "./state.route";
-import { routeUser } from "./user.route";
+import { routeState } from "./state.router";
+import { routeUser } from "./user.router";
 
 const router = Router();
 
