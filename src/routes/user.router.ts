@@ -11,23 +11,23 @@ import {
   userValidatorUpdate,
 } from "../middlewares/validatorsUser";
 
-export const routeUser = Router();
+export const routerUser = Router();
 const user = new User();
 
-routeUser.get("/", [verificaToken, isRegister], user.getUsers);
-routeUser.get("/profile", verificaToken, user.getUserId);
-routeUser.get("/:id", [verificaToken, isRegister], user.getUserId);
-routeUser.post(
+routerUser.get("/", [verificaToken, isRegister], user.getUsers);
+routerUser.get("/profile", verificaToken, user.getUserId);
+routerUser.get("/:id", [verificaToken, isRegister], user.getUserId);
+routerUser.post(
   "/",
   [verificaToken, isRegister, validate(userValidator)],
   user.postUser
 );
-routeUser.put(
+routerUser.put(
   "/profile",
   [verificaToken, validate(userValidatorUpdate)],
   user.putUser
 );
-routeUser.put(
+routerUser.put(
   "/:id",
   [verificaToken, isAdmin, validate(userValidatorUpdate)],
   user.putUser

@@ -8,19 +8,19 @@ import {
 } from "../middlewares/autentication";
 import { stateValidator } from "../middlewares/uniqueValidators";
 
-export const routeState = Router();
+export const routerState = Router();
 const state = new State();
 
-routeState.get("/", verificaToken, state.getState);
-routeState.get("/:id", verificaToken, state.getStateId);
-routeState.post(
+routerState.get("/", verificaToken, state.getState);
+routerState.get("/:id", verificaToken, state.getStateId);
+routerState.post(
   "/",
   verificaToken,
   isRegister,
   validate(stateValidator),
   state.postState
 );
-routeState.put(
+routerState.put(
   "/:id",
   verificaToken,
   isAdmin,
