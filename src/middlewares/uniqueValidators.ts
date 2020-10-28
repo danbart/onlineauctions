@@ -17,3 +17,9 @@ export const typeValidator = {
     type: Joi.string().required(),
   }),
 };
+
+export const noteValidator = {
+  body: Joi.object({
+    note: Joi.string().required(),
+  }),
+};
