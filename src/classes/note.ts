@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
-import MySql from "../mysql/mysql";
-import { IResponse } from "./interface/IResponse";
 import { ModelNote } from "../models/note";
+import MySql from "../mysql/mysql";
+import { userLogin } from "../utils/jwt";
+import { IResponse } from "./interface/IResponse";
 
 export class Note {
   getNote = async (req: Request, res: Response) => {
@@ -95,11 +96,13 @@ export class Note {
     };
 
     const vehicleId = req.params.id;
+    let userId;
+    await userLogin(req).then((res) => (userId = res));
 
     let notes: ModelNote[] = [];
 
     await MySql.executeQuery(
-      `SELECT * FROM note where id_vehicle="${vehicleId}" limit 1;`
+      `SELECT * FROM note where id_vehicle="${vehicleId}" and id_user="${userId}" limit 1;`
     ).then((data: any) => (notes = data));
 
     if (notes.length === 0) {
@@ -136,18 +139,23 @@ export class Note {
       ok: false,
     };
 
+    const vehicleId = req.params.idVehicle;
     const noteId = req.params.id;
+    let userId;
+    await userLogin(req).then((res) => (userId = res));
 
     const note = new ModelNote();
 
     let notes: ModelNote[] = [];
 
     await MySql.executeQuery(
-      `SELECT * FROM note where id_note="${noteId}" limit 1;`
+      `SELECT * FROM note where id_note="${noteId}" inner join vehicle on 
+      vehicle.id_vehicle=note.id_vehicle where vehicle.id_vehicle="${vehicleId}" 
+      and vehicle.id_user="${userId}" limit 1;`
     ).then((data: any) => (notes = data));
 
     if (notes.length === 0) {
-      result.error = { message: "Estado no existe" };
+      result.error = { message: "Nota no existe" };
       return res.json(result);
     }
 

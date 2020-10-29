@@ -16,7 +16,7 @@ routerNote.post(
   note.postNote
 );
 routerNote.put(
-  "/note/:id",
+  "/:idVehicle/note/:id",
   verificaToken,
   validate(noteValidator),
   note.putNote
