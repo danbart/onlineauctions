@@ -40,7 +40,7 @@ export class BodyStyle {
     ).then((data: any) => (bodyStyles = data));
 
     if (bodyStyles.length === 0) {
-      result.error = { message: "Estado no existe" };
+      result.error = { message: "Carroceria no existe" };
       return res.json(result);
     }
 

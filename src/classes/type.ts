@@ -40,7 +40,7 @@ export class Type {
     ).then((data: any) => (types = data));
 
     if (types.length === 0) {
-      result.error = { message: "Estado no existe" };
+      result.error = { message: "Typo no existe" };
       return res.json(result);
     }
 
