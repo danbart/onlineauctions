@@ -102,7 +102,7 @@ export class Note {
     let notes: ModelNote[] = [];
 
     await MySql.executeQuery(
-      `SELECT * FROM note where id_vehicle="${vehicleId}" and id_user="${userId}" limit 1;`
+      `SELECT * FROM note inner join vehicle on note.id_vehicle=vehicle.id_vehicle where note.id_vehicle="${vehicleId}" and vehicle.id_user="${userId}" limit 1;`
     ).then((data: any) => (notes = data));
 
     if (notes.length === 0) {
@@ -149,7 +149,7 @@ export class Note {
     let notes: ModelNote[] = [];
 
     await MySql.executeQuery(
-      `SELECT * FROM note where id_note="${noteId}" inner join vehicle on 
+      `SELECT * FROM note inner join vehicle on 
       vehicle.id_vehicle=note.id_vehicle where vehicle.id_vehicle="${vehicleId}" 
       and vehicle.id_user="${userId}" limit 1;`
     ).then((data: any) => (notes = data));
