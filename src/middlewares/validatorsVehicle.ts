@@ -24,3 +24,24 @@ export const vehicleValidator = {
     body_style: Joi.number().integer().min(1).required(),
   }),
 };
+
+export const vehicleValidatorUpdate = {
+  body: Joi.object({
+    model: Joi.number()
+      .integer()
+      .min(year.getFullYear() - 50)
+      .max(year.getFullYear()),
+    mileage: Joi.string(),
+    colour: Joi.string(),
+    transmission: Joi.string(),
+    cylinders: Joi.string(),
+    fuel: Joi.string(),
+    revolutions: Joi.number().min(0),
+    motor: Joi.number().min(0),
+    keys: Joi.bool(),
+    description: Joi.string(),
+    type: Joi.number().integer().min(1),
+    state: Joi.number().integer().min(1),
+    body_style: Joi.number().integer().min(1),
+  }),
+};
