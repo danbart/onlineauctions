@@ -181,21 +181,30 @@ export class User {
       return res.json(result);
     }
 
-    !!req.body.name && (user.name = req.body.name);
-    !!req.body.last_name && (user.last_name = req.body.last_name);
-    !!req.body.addres && (user.addres = req.body.addres);
+    !!req.body.name ? (user.name = req.body.name) : (user.name = users[0].name);
+    !!req.body.last_name
+      ? (user.last_name = req.body.last_name)
+      : (user.last_name = users[0].last_name);
+    !!req.body.addres
+      ? (user.addres = req.body.addres)
+      : (user.addres = users[0].addres);
     if (!!req.body.phone) {
       const phone = new PhoneNumber(req.body.phone, "GT");
       user.phone = phone.getNumber("e164");
-    }
-    !!req.body.avatar && (user.avatar = req.body.avatar);
-    !!req.body.web_site && (user.web_site = req.body.web_site);
-    !!req.body.facebook && (user.facebook = req.body.facebook);
-    !!req.body.twitter && (user.twitter = req.body.twitter);
+    } else user.phone = users[0].phone;
+    !!req.body.web_site
+      ? (user.web_site = req.body.web_site)
+      : (user.web_site = users[0].web_site);
+    !!req.body.facebook
+      ? (user.facebook = req.body.facebook)
+      : (user.facebook = users[0].facebook);
+    !!req.body.twitter
+      ? (user.twitter = req.body.twitter)
+      : (user.twitter = users[0].twitter);
 
     try {
       await MySql.executeQuery(
-        `UPDATE user SET name="${user.name}",last_name="${user.last_name}", address="${user.addres}",phone="${user.phone}",avatar="${user.avatar}",
+        `UPDATE user SET name="${user.name}",last_name="${user.last_name}", address="${user.addres}",phone="${user.phone}",
         web_site="${user.web_site}",facebook="${user.facebook}",twitter="${user.twitter}" where id_user=${userId};`
       )
         .then((data: any) => {

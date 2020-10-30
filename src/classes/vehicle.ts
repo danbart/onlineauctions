@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import moment from "moment";
 import { ModelBodyStyle } from "../models/bodyStyle";
 import { ModelState } from "../models/state";
 import { ModelType } from "../models/type";
@@ -202,20 +203,47 @@ export class Vehicle {
       return res.status(401).json(result);
     }
 
-    !!req.body.model && (vehicle.model = req.body.model + "-01-01");
-    !!req.body.mileage && (vehicle.mileage = req.body.mileage);
-    !!req.body.colour && (vehicle.colour = req.body.colour);
-    !!req.body.transmission && (vehicle.transmission = req.body.transmission);
-    !!req.body.cylinders && (vehicle.cylinders = req.body.cylinders);
-    !!req.body.fuel && (vehicle.fuel = req.body.fuel);
-    !!req.body.revolutions && (vehicle.revolutions = req.body.revolutions);
-    !!req.body.motor && (vehicle.motor = req.body.motor);
-    !!req.body.keys && (vehicle.keys = req.body.keys);
-    !!req.body.description && (vehicle.description = req.body.description);
-    !!req.body.type && (vehicle.id_type = parseInt(req.body.type));
-    !!req.body.state && (vehicle.id_state = parseInt(req.body.state));
-    !!req.body.body_style &&
-      (vehicle.id_body_style = parseInt(req.body.body_style));
+    !!req.body.model
+      ? (vehicle.model = req.body.model + "-01-01")
+      : (vehicle.model = moment(vehicles[0].model)
+          .format("YYYY-MM-DD")
+          .toString());
+    !!req.body.mileage
+      ? (vehicle.mileage = req.body.mileage)
+      : (vehicle.mileage = vehicles[0].mileage);
+    !!req.body.colour
+      ? (vehicle.colour = req.body.colour)
+      : (vehicle.colour = vehicles[0].colour);
+    !!req.body.transmission
+      ? (vehicle.transmission = req.body.transmission)
+      : (vehicle.transmission = vehicles[0].transmission);
+    !!req.body.cylinders
+      ? (vehicle.cylinders = req.body.cylinders)
+      : (vehicle.cylinders = vehicles[0].cylinders);
+    !!req.body.fuel
+      ? (vehicle.fuel = req.body.fuel)
+      : (vehicle.fuel = vehicles[0].fuel);
+    !!req.body.revolutions
+      ? (vehicle.revolutions = req.body.revolutions)
+      : (vehicle.revolutions = vehicles[0].revolutions);
+    !!req.body.motor
+      ? (vehicle.motor = req.body.motor)
+      : (vehicle.motor = vehicles[0].motor);
+    !!req.body.keys
+      ? (vehicle.keys = req.body.keys)
+      : (vehicle.keys = vehicles[0].keys);
+    !!req.body.description
+      ? (vehicle.description = req.body.description)
+      : (vehicle.description = vehicles[0].description);
+    !!req.body.type
+      ? (vehicle.id_type = parseInt(req.body.type))
+      : (vehicle.id_type = vehicles[0].id_type);
+    !!req.body.state
+      ? (vehicle.id_state = parseInt(req.body.state))
+      : (vehicle.id_state = vehicles[0].id_state);
+    !!req.body.body_style
+      ? (vehicle.id_body_style = parseInt(req.body.body_style))
+      : (vehicle.id_body_style = vehicles[0].id_body_style);
 
     if (!!req.body.state) {
       let states: ModelState[] = [];
@@ -260,7 +288,7 @@ export class Vehicle {
       await MySql.executeQuery(
         `UPDATE vehicle SET model="${vehicle.model}", mileage="${vehicle.mileage}",colour="${vehicle.colour}",transmission="${vehicle.transmission}",
         cylinders="${vehicle.cylinders}",fuel="${vehicle.fuel}",revolutions=${vehicle.revolutions},motor=${vehicle.motor},\`keys\`=${vehicle.keys},
-        description="${vehicle.description}",id_type=${vehicle.id_type},id_state=${vehicle.id_state},id_body_style=${vehicle.id_body_style} WHERE=${vehicleId};`
+        description="${vehicle.description}",id_type=${vehicle.id_type},id_state=${vehicle.id_state},id_body_style=${vehicle.id_body_style} WHERE id_vehicle=${vehicleId};`
       )
         .then((data: any) => {
           result.ok = true;
@@ -269,7 +297,6 @@ export class Vehicle {
         .catch((err) => {
           result.ok = false;
           result.error = err.sqlMessage;
-          console.log(err);
         });
 
       res.json(result);
