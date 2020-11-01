@@ -19,7 +19,7 @@ export class Note {
     ).then((data: any) => (notes = data));
 
     if (notes.length === 0) {
-      result.error = { message: "Vehiculo no existe" };
+      result.error = { message: "Vehiculo no cuenta con notas" };
       return res.status(401).json(result);
     }
 
@@ -58,7 +58,7 @@ export class Note {
     ).then((data: any) => (vehicles = data));
 
     if (vehicles.length === 0) {
-      result.error = { message: "Vehiculo no existe" };
+      result.error = { message: "Vehiculo no cuenta con notas" };
       return res.status(401).json(result);
     }
 
@@ -102,7 +102,7 @@ export class Note {
     let notes: ModelNote[] = [];
 
     await MySql.executeQuery(
-      `SELECT * FROM note inner join vehicle on note.id_vehicle=vehicle.id_vehicle where note.id_vehicle="${vehicleId}" and vehicle.id_user="${userId}" limit 1;`
+      `SELECT * FROM vehicle where id_vehicle="${vehicleId}" and id_user="${userId}" limit 1;`
     ).then((data: any) => (notes = data));
 
     if (notes.length === 0) {
@@ -151,12 +151,12 @@ export class Note {
     await MySql.executeQuery(
       `SELECT * FROM note inner join vehicle on 
       vehicle.id_vehicle=note.id_vehicle where vehicle.id_vehicle="${vehicleId}" 
-      and vehicle.id_user="${userId}" limit 1;`
+      and vehicle.id_user="${userId}" and note.id_note=${noteId} limit 1;`
     ).then((data: any) => (notes = data));
 
     if (notes.length === 0) {
-      result.error = { message: "Nota no existe" };
-      return res.json(result);
+      result.error = { message: "Nota no existe o no puede editar nota" };
+      return res.status(401).json(result);
     }
 
     !!req.body.note && (note.note = req.body.note);
