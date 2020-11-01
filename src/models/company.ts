@@ -23,8 +23,8 @@ export class ModelCompany {
     this.mission = "";
     this.vision = "";
     this.values = "";
-    this.maximum_profit = 0;
-    this.minimum_profit = 0;
+    this.maximum_profit = 5;
+    this.minimum_profit = 3;
     this.created_at = "";
     this.updated_at = "";
   }
