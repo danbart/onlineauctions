@@ -2,7 +2,7 @@ import PhoneNumber from "awesome-phonenumber";
 import bcrypt from "bcrypt";
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import { CADUCIDAD_TOKEN, SEED } from "../global/environment";
+import { CADUCIDAD_TOKEN, JWT_PRIVATE_KEY } from "../global/environment";
 import { ModelRole } from "../models/role";
 import { ModelUser } from "../models/user";
 import MySql from "../mysql/mysql";
@@ -246,7 +246,7 @@ export class User {
     if (await bcrypt.compare(user.password, Object.values(users)[0].password)) {
       const token = await jwt.sign(
         { id: Object.values(users)[0].id_user },
-        Buffer.from(SEED, "base64"),
+        Buffer.from(JWT_PRIVATE_KEY, "base64"),
         {
           expiresIn: CADUCIDAD_TOKEN,
         }

@@ -41,4 +41,4 @@ export const CADUCIDAD_TOKEN = process.env.CADUCIDAD_TOKEN || 60 * 60 * 24 * 30;
 // SEED o semilla de autenticación
 // ===============================
 
-export const SEED = process.env.JWT_PRIVATE_KEY as string;
+export const JWT_PRIVATE_KEY = process.env.JWT_PRIVATE_KEY as string;

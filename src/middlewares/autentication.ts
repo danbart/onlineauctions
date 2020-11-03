@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { IResponse } from "../classes/interface/IResponse";
-import { SEED } from "../global/environment";
+import { JWT_PRIVATE_KEY } from "../global/environment";
 import { ModelRole } from "../models/role";
 import MySql from "../mysql/mysql";
 
@@ -26,7 +26,7 @@ export const verificaToken = (
   try {
     jwt.verify(
       token.replace("Bearer ", ""),
-      Buffer.from(SEED, "base64"),
+      Buffer.from(JWT_PRIVATE_KEY, "base64"),
       (err: any, decoded: any) => {
         if (err) {
           result.error = { message: "Token no Valido" };
@@ -57,7 +57,7 @@ export const isAdmin = async (
 
     const payload: any = jwt.verify(
       token.replace("Bearer ", ""),
-      Buffer.from(SEED, "base64")
+      Buffer.from(JWT_PRIVATE_KEY, "base64")
     );
 
     await MySql.executeQuery(
@@ -92,7 +92,7 @@ export const isRegister = async (
 
     const payload: any = jwt.verify(
       token.replace("Bearer ", ""),
-      Buffer.from(SEED, "base64")
+      Buffer.from(JWT_PRIVATE_KEY, "base64")
     );
 
     await MySql.executeQuery(
