@@ -1,9 +1,12 @@
 import { Request, Response } from "express";
 import moment from "moment";
 import { ModelAccount } from "../models/account";
+import { ModelCredit } from "../models/credit";
 import { ModelCreditCard } from "../models/creditCard";
+import { ModelDebt } from "../models/debt";
 import { ModelUser } from "../models/user";
 import MySql from "../mysql/mysql";
+import { balance, balanceDebt } from "../utils/balance";
 import { cypher, decypher } from "../utils/cryptoCreditCard";
 import { userLogin } from "../utils/jwt";
 import { IResponse } from "./interface/IResponse";
@@ -135,7 +138,7 @@ export class Account {
     }
 
     await MySql.executeQuery(
-      `SELECT * FROM account where id_user="${userId}" and active is null;`
+      `SELECT * FROM account where id_user="${userId}" and active is not null;`
     ).then((data: any) => (accounts = data));
 
     if (accounts.length === 0) {
@@ -266,10 +269,10 @@ export class Account {
     }
 
     await MySql.executeQuery(
-      `SELECT * FROM account where id_user="${userId}" and id_account=${accountId} and active is null;`
+      `SELECT * FROM account where id_user="${userId}" and id_account=${accountId} and active is not null;`
     ).then((data: any) => (accounts = data));
 
-    if (accounts.length > 0) {
+    if (accounts.length === 0) {
       result.error = {
         message: "Cuenta no Existe o esta desactivada",
       };
@@ -331,5 +334,287 @@ export class Account {
     } catch (error) {
       console.log(error);
     }
+  };
+
+  postCreditAccount = async (req: Request, res: Response) => {
+    const result: IResponse = {
+      ok: false,
+    };
+
+    const credit = new ModelCredit();
+
+    let accounts: ModelAccount[] = [];
+    let users: ModelUser[] = [];
+
+    let userId = req.params.idUser;
+    let accountId = req.params.idAccount;
+
+    await MySql.executeQuery(
+      `SELECT * FROM user where id_user="${userId}";`
+    ).then((data: any) => (users = data));
+
+    if (users.length === 0) {
+      result.error = {
+        message: "Usuario no existe",
+      };
+      return res.status(401).json(result);
+    }
+
+    await MySql.executeQuery(
+      `SELECT * FROM account where id_user="${userId}" and id_account=${accountId} and active is not null;`
+    ).then((data: any) => (accounts = data));
+
+    if (accounts.length === 0) {
+      result.error = {
+        message: "Cuenta no Existe o esta desactivada",
+      };
+      return res.status(401).json(result);
+    }
+
+    !!req.body.amount && (credit.amount = req.body.amount);
+    !!req.body.reason && (credit.reason = req.body.reason);
+    !!req.body.paid_type && (credit.paid_type = req.body.paid_type);
+
+    try {
+      await MySql.executeQuery(
+        `INSERT INTO credit(amount, reason, paid_type, id_account)
+            values("${credit.amount}", "${credit.reason}", "${credit.paid_type}", ${accountId});`
+      )
+        .then(async (data: any) => {
+          result.ok = true;
+          result.data = [{ creditId: data.insertId }];
+        })
+        .catch((err) => {
+          result.ok = false;
+          result.error = err.sqlMessage;
+        });
+      res.json(result);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  postDebtAccount = async (req: Request, res: Response) => {
+    const result: IResponse = {
+      ok: false,
+    };
+
+    const debt = new ModelDebt();
+
+    let accounts: ModelAccount[] = [];
+    let users: ModelUser[] = [];
+
+    let userId = req.params.idUser;
+    let accountId = req.params.idAccount;
+
+    await MySql.executeQuery(
+      `SELECT * FROM user where id_user="${userId}";`
+    ).then((data: any) => (users = data));
+
+    if (users.length === 0) {
+      result.error = {
+        message: "Usuario no existe",
+      };
+      return res.status(401).json(result);
+    }
+
+    await MySql.executeQuery(
+      `SELECT * FROM account where id_user="${userId}" and id_account=${accountId} and active is not null;`
+    ).then((data: any) => (accounts = data));
+
+    if (accounts.length === 0) {
+      result.error = {
+        message: "Cuenta no Existe o esta desactivada",
+      };
+      return res.status(401).json(result);
+    }
+
+    const credit = await balanceDebt(
+      parseInt(accountId),
+      parseInt(userId),
+      parseInt(req.body.amount)
+    );
+    !!req.body.amount && (debt.amount = req.body.amount);
+    !!req.body.reason && (debt.reason = req.body.reason);
+
+    if (credit - debt.amount < 0) {
+      result.error = {
+        message: "Cuenta sin fondos",
+      };
+      return res.status(401).json(result);
+    }
+
+    try {
+      await MySql.executeQuery(
+        `INSERT INTO debt(amount, reason, id_account)
+            values("${debt.amount}", "${debt.reason}", ${accountId});`
+      )
+        .then(async (data: any) => {
+          result.ok = true;
+          result.data = [{ debtId: data.insertId }];
+        })
+        .catch((err) => {
+          result.ok = false;
+          result.error = err.sqlMessage;
+        });
+      res.json(result);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  getBalanceAccount = async (req: Request, res: Response) => {
+    const result: IResponse = {
+      ok: false,
+    };
+
+    let accounts: ModelAccount[] = [];
+    let users: ModelUser[] = [];
+
+    let userId = req.params.idUser;
+    let accountId = req.params.idAccount;
+
+    if (!userId) {
+      await userLogin(req).then((res) => (userId = res));
+    }
+
+    await MySql.executeQuery(
+      `SELECT * FROM user where id_user="${userId}";`
+    ).then((data: any) => (users = data));
+
+    if (users.length === 0) {
+      result.error = {
+        message: "Usuario no existe",
+      };
+      return res.status(401).json(result);
+    }
+
+    await MySql.executeQuery(
+      `SELECT * FROM account where id_user="${userId}" and id_account=${accountId} and active is not null;`
+    ).then((data: any) => (accounts = data));
+
+    if (accounts.length === 0) {
+      result.error = {
+        message: "Cuenta no Existe o esta desactivada",
+      };
+      return res.status(401).json(result);
+    }
+
+    const credit = await balance(parseInt(accountId), parseInt(userId));
+
+    result.data = [
+      {
+        id_user: userId,
+        id_account: accountId,
+        credits: credit[0],
+        debts: credit[1],
+        balance: credit[0] - credit[1],
+      },
+    ];
+    return res.json(result);
+  };
+
+  getCreditAccount = async (req: Request, res: Response) => {
+    const result: IResponse = {
+      ok: false,
+    };
+
+    let accounts: ModelAccount[] = [];
+    let users: ModelUser[] = [];
+
+    let userId = req.params.idUser;
+    let accountId = req.params.idAccount;
+
+    if (!userId) {
+      await userLogin(req).then((res) => (userId = res));
+    }
+
+    await MySql.executeQuery(
+      `SELECT * FROM user where id_user="${userId}";`
+    ).then((data: any) => (users = data));
+
+    if (users.length === 0) {
+      result.error = {
+        message: "Usuario no existe",
+      };
+      return res.status(401).json(result);
+    }
+
+    await MySql.executeQuery(
+      `SELECT * FROM account where id_user="${userId}" and id_account=${accountId} and active is not null;`
+    ).then((data: any) => (accounts = data));
+
+    if (accounts.length === 0) {
+      result.error = {
+        message: "Cuenta no Existe o esta desactivada",
+      };
+      return res.status(401).json(result);
+    }
+
+    await MySql.executeQuery(
+      `SELECT ct.* FROM account ac INNER JOIN credit ct on ac.id_account=ct.id_account where ac.id_user=${userId} and ac.id_account=${accountId} and ac.active is not null;`
+    )
+      .then((data: any) => {
+        result.ok = true;
+        result.data = data;
+      })
+      .catch((err) => {
+        result.ok = false;
+        result.error = err.sqlMessage;
+      });
+
+    res.json(result);
+  };
+
+  getDebtAccount = async (req: Request, res: Response) => {
+    const result: IResponse = {
+      ok: false,
+    };
+
+    let accounts: ModelAccount[] = [];
+    let users: ModelUser[] = [];
+
+    let userId = req.params.idUser;
+    let accountId = req.params.idAccount;
+
+    if (!userId) {
+      await userLogin(req).then((res) => (userId = res));
+    }
+
+    await MySql.executeQuery(
+      `SELECT * FROM user where id_user="${userId}";`
+    ).then((data: any) => (users = data));
+
+    if (users.length === 0) {
+      result.error = {
+        message: "Usuario no existe",
+      };
+      return res.status(401).json(result);
+    }
+
+    await MySql.executeQuery(
+      `SELECT * FROM account where id_user="${userId}" and id_account=${accountId} and active is not null;`
+    ).then((data: any) => (accounts = data));
+
+    if (accounts.length === 0) {
+      result.error = {
+        message: "Cuenta no Existe o esta desactivada",
+      };
+      return res.status(401).json(result);
+    }
+
+    await MySql.executeQuery(
+      `SELECT dbt.* FROM account ac INNER JOIN debt dbt on ac.id_account=dbt.id_account where ac.id_user=${userId} and ac.id_account=${accountId} and ac.active is not null;`
+    )
+      .then((data: any) => {
+        result.ok = true;
+        result.data = data;
+      })
+      .catch((err) => {
+        result.ok = false;
+        result.error = err.sqlMessage;
+      });
+
+    res.json(result);
   };
 }

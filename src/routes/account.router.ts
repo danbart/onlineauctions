@@ -6,7 +6,11 @@ import {
   isRegister,
   verificaToken,
 } from "../middlewares/autentication";
-import { cardValidator } from "../middlewares/validatorsCreditCard";
+import {
+  cardValidator,
+  creditValidator,
+  debtValidator,
+} from "../middlewares/validatorsAccount";
 
 export const routerAccount = Router();
 const account = new Account();
@@ -36,4 +40,41 @@ routerAccount.post(
   isRegister,
   validate(cardValidator),
   account.postCreditCard
+);
+
+routerAccount.post(
+  "/:idUser/account/:idAccount/credit",
+  verificaToken,
+  isRegister,
+  validate(creditValidator),
+  account.postCreditAccount
+);
+
+routerAccount.post(
+  "/:idUser/account/:idAccount/debt",
+  verificaToken,
+  isRegister,
+  validate(debtValidator),
+  account.postDebtAccount
+);
+
+routerAccount.get(
+  "/:idUser/account/:idAccount/balance",
+  verificaToken,
+  isRegister,
+  account.getBalanceAccount
+);
+
+routerAccount.get(
+  "/:idUser/account/:idAccount/credit",
+  verificaToken,
+  isRegister,
+  account.getCreditAccount
+);
+
+routerAccount.get(
+  "/:idUser/account/:idAccount/debt",
+  verificaToken,
+  isRegister,
+  account.getDebtAccount
 );
