@@ -15,10 +15,24 @@ import {
 export const routerAccount = Router();
 const account = new Account();
 
-routerAccount.get("/:id/account/", verificaToken, account.getAcount);
+routerAccount.get("/profile/account/", verificaToken, account.getAcount);
+routerAccount.get(
+  "/:id/account/",
+  verificaToken,
+  isRegister,
+  account.getAcount
+);
+
+routerAccount.get(
+  "/profile/account/:idAccount",
+  verificaToken,
+  account.getAccountId
+);
+
 routerAccount.get(
   "/:idUser/account/:idAccount",
   verificaToken,
+  isRegister,
   account.getAccountId
 );
 routerAccount.post(
@@ -28,12 +42,14 @@ routerAccount.post(
   validate(cardValidator),
   account.postAccount
 );
+
 routerAccount.put(
   "/:idUser/account/:idAccount",
   verificaToken,
   isAdmin,
   account.putAccountDesactive
 );
+
 routerAccount.post(
   "/:idUser/account/:idAccount",
   verificaToken,
@@ -59,6 +75,12 @@ routerAccount.post(
 );
 
 routerAccount.get(
+  "/profile/account/:idAccount/balance",
+  verificaToken,
+  account.getBalanceAccount
+);
+
+routerAccount.get(
   "/:idUser/account/:idAccount/balance",
   verificaToken,
   isRegister,
@@ -66,10 +88,22 @@ routerAccount.get(
 );
 
 routerAccount.get(
+  "/profile/account/:idAccount/credit",
+  verificaToken,
+  account.getCreditAccount
+);
+
+routerAccount.get(
   "/:idUser/account/:idAccount/credit",
   verificaToken,
   isRegister,
   account.getCreditAccount
+);
+
+routerAccount.get(
+  "/profile/account/:idAccount/debt",
+  verificaToken,
+  account.getDebtAccount
 );
 
 routerAccount.get(

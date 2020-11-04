@@ -141,7 +141,7 @@ export class Account {
       `SELECT * FROM account where id_user="${userId}" and active is not null;`
     ).then((data: any) => (accounts = data));
 
-    if (accounts.length === 0) {
+    if (accounts.length > 0) {
       result.error = {
         message: "Usuario ya tiene cuenta",
       };
