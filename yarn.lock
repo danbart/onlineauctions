@@ -70,6 +70,13 @@
   dependencies:
     "@types/node" "*"
 
+"@types/express-fileupload@^1.1.5":
+  version "1.1.5"
+  resolved "https://registry.yarnpkg.com/@types/express-fileupload/-/express-fileupload-1.1.5.tgz#dc8a971f9060d50b12e3908a09248f1772e99484"
+  integrity sha512-03U+jevC01fzqxh7GlvfbEem0ICnp+hDLdtnMU7SNbIcdpe7LnFYkZLjycCQpwE9bY0PaBbLxG4gPyUWucaFjw==
+  dependencies:
+    "@types/express" "*"
+
 "@types/express-serve-static-core@*":
   version "4.17.13"
   resolved "https://registry.yarnpkg.com/@types/express-serve-static-core/-/express-serve-static-core-4.17.13.tgz#d9af025e925fc8b089be37423b8d1eac781be084"
