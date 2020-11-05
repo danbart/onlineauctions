@@ -7,6 +7,7 @@ import { ModelVehicle } from "../models/vehicle";
 import MySql from "../mysql/mysql";
 import { userLogin } from "../utils/jwt";
 import { IResponse } from "./interface/IResponse";
+import { uploadFile } from "../utils/upload";
 
 export class Vehicle {
   getVehicle = async (req: Request, res: Response) => {
@@ -303,5 +304,36 @@ export class Vehicle {
     } catch (error) {
       console.log(error);
     }
+  };
+
+  postPhoto = async (req: Request, res: Response) => {
+    const result: IResponse = {
+      ok: false,
+    };
+    const idVehicle = req.params.id;
+
+    let userId = 0;
+    await userLogin(req).then((res) => (userId = res));
+
+    let vehicles: ModelVehicle[] = [];
+
+    await MySql.executeQuery(
+      `SELECT * FROM vehicle where id_vehicle=${idVehicle} and id_user=${userId} limit 1;`
+    ).then((data: any) => (vehicles = data));
+
+    if (vehicles.length === 0) {
+      result.error = {
+        message: "El Vehiculo no existe o No puedes editar este vehiculo",
+      };
+      return res.status(401).json(result);
+    }
+
+    if (!req.files) (result.error = { menssage: "archivo requerido" }, res.json(result));
+
+    const archivo = req.files;
+
+    const resp = await uploadFile(parseInt(idVehicle), "vehicle", archivo);
+
+    res.json(resp);
   };
 }

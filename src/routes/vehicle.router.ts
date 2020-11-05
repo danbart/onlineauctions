@@ -24,3 +24,5 @@ routerVehicle.put(
   validate(vehicleValidatorUpdate),
   vehicle.putVehicle
 );
+
+routerVehicle.post("/:id/photo", verificaToken, vehicle.postPhoto);

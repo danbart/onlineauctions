@@ -7,6 +7,7 @@ import { createAdmin, createRoles } from "./lib/initialSetup";
 import MySql from "./mysql/mysql";
 import router from "./routes/router";
 import Server from "./server/server";
+import fileUpload from "express-fileupload";
 
 const server = Server.instance;
 
@@ -21,6 +22,9 @@ server.app.use(bodyParser.json());
 
 // CORS
 server.app.use(cors({ origin: true, credentials: true }));
+
+//uploads
+server.app.use(fileUpload());
 
 // Rutas
 server.app.use("/api/", router);
