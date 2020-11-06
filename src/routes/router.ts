@@ -8,6 +8,7 @@ import { routerState } from "./state.router";
 import { routerType } from "./type.router";
 import { routerUser } from "./user.router";
 import { routerVehicle } from "./vehicle.router";
+import { routerImagen } from './image.router';
 
 const router = Router();
 
@@ -20,5 +21,6 @@ router.use("/type/", routerType);
 router.use("/vehicle/", routerNote);
 router.use("/vehicle/", routerVehicle);
 router.use("/company/", routerCompany);
+router.use('/imagen/', routerImagen)
 
 export default router;

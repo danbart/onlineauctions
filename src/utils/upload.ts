@@ -54,6 +54,7 @@ export const uploadFile = async (id: number, tipo: string, req: Request) => {
       })
       .catch((err) => {
         result.error = err.sqlMessage;
+        borrarArchivo(nombreArchivo, tipo);
       });
   } else {
     await MySql.executeQuery(
@@ -67,17 +68,12 @@ export const uploadFile = async (id: number, tipo: string, req: Request) => {
       })
       .catch((err) => {
         result.error = err.sqlMessage;
+        borrarArchivo(nombreArchivo, tipo);
       });
   }
 
   return result;
 };
-
-export const photoVehicle = async (
-  id: number,
-  res: Response,
-  nombreFoto: string
-) => {};
 
 const borrarArchivo = (nombre: string, tipo: string) => {
   let pathImage = path.resolve(__dirname, `../docs/upload/${tipo}/${nombre}`);

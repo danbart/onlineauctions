@@ -8,6 +8,7 @@ import MySql from "../mysql/mysql";
 import { userLogin } from "../utils/jwt";
 import { uploadFile } from "../utils/upload";
 import { IResponse } from "./interface/IResponse";
+import { ModelPhoto } from "../models/photo";
 
 export class Vehicle {
   getVehicle = async (req: Request, res: Response) => {
@@ -336,5 +337,82 @@ export class Vehicle {
     const resp = await uploadFile(parseInt(idVehicle), "vehicle", req);
 
     res.json(resp);
+  };
+
+  getPhoto = async (req: Request, res: Response) => {
+    const result: IResponse = {
+      ok: false,
+    };
+    const idVehicle = req.params.id;
+
+    let photos: ModelPhoto[] = [];
+
+    await MySql.executeQuery(
+      `SELECT * FROM photo where id_vehicle=${idVehicle};`
+    ).then((data: any) => (photos = data));
+
+    if (photos.length === 0) {
+      result.error = {
+        message: "El Vehiculo no cuenta con fotos",
+      };
+      return res.status(401).json(result);
+    }
+
+    try {
+      await MySql.executeQuery(
+        `SELECT * FROM photo where id_vehicle=${idVehicle};`
+      )
+        .then((data: any) => {
+          result.ok = true;
+          result.data = data;
+        })
+        .catch((err) => {
+          result.ok = false;
+          result.error = err.sqlMessage;
+        });
+
+      res.json(result);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  getPhotoId = async (req: Request, res: Response) => {
+    const result: IResponse = {
+      ok: false,
+    };
+    const idVehicle = req.params.idVehicle;
+    const idPhoto = req.params.idPhoto;
+
+    let photos: ModelPhoto[] = [];
+
+    await MySql.executeQuery(
+      `SELECT * FROM photo where id_vehicle=${idVehicle} and id_photo=${idPhoto};`
+    ).then((data: any) => (photos = data));
+
+    if (photos.length === 0) {
+      result.error = {
+        message: "El Vehiculo no cuenta con esa foto",
+      };
+      return res.status(401).json(result);
+    }
+
+    try {
+      await MySql.executeQuery(
+        `SELECT * FROM photo where id_vehicle=${idVehicle} and id_photo=${idPhoto};`
+      )
+        .then((data: any) => {
+          result.ok = true;
+          result.data = data;
+        })
+        .catch((err) => {
+          result.ok = false;
+          result.error = err.sqlMessage;
+        });
+
+      res.json(result);
+    } catch (error) {
+      console.log(error);
+    }
   };
 }

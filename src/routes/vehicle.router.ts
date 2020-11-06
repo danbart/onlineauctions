@@ -26,3 +26,9 @@ routerVehicle.put(
 );
 
 routerVehicle.post("/:id/photo", verificaToken, vehicle.postPhoto);
+
+routerVehicle.get("/:id/photo", vehicle.getPhoto);
+
+routerVehicle.get("/:idVehicle/photo/:idPhoto", vehicle.getPhotoId);
+
+routerVehicle.get("/imagen/:tipo/", verificaToken, vehicle.postPhoto);
