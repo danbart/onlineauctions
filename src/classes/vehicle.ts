@@ -6,8 +6,8 @@ import { ModelType } from "../models/type";
 import { ModelVehicle } from "../models/vehicle";
 import MySql from "../mysql/mysql";
 import { userLogin } from "../utils/jwt";
-import { IResponse } from "./interface/IResponse";
 import { uploadFile } from "../utils/upload";
+import { IResponse } from "./interface/IResponse";
 
 export class Vehicle {
   getVehicle = async (req: Request, res: Response) => {
@@ -328,11 +328,12 @@ export class Vehicle {
       return res.status(401).json(result);
     }
 
-    if (!req.files) (result.error = { menssage: "archivo requerido" }, res.json(result));
+    if (!req.files) {
+      result.error = { menssage: "archivo requerido" };
+      return res.json(result);
+    }
 
-    const archivo = req.files;
-
-    const resp = await uploadFile(parseInt(idVehicle), "vehicle", archivo);
+    const resp = await uploadFile(parseInt(idVehicle), "vehicle", req);
 
     res.json(resp);
   };

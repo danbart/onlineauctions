@@ -1,7 +1,11 @@
+import { Request, Response } from "express";
+import fs from "fs";
+import path from "path";
 import { IResponse } from "../classes/interface/IResponse";
 import MySql from "../mysql/mysql";
+import { IFiles } from "./interfaz/IFiles";
 
-export const uploadFile = async (id: number, tipo: string, file: any) => {
+export const uploadFile = async (id: number, tipo: string, req: Request) => {
   let result: IResponse = {
     ok: false,
   };
@@ -9,13 +13,19 @@ export const uploadFile = async (id: number, tipo: string, file: any) => {
   const validTiopo = ["avatar", "vehicle"];
   const extensionesValidas = ["png", "jpg", "jpeg"];
 
-  if (!file) return (result.error = { menssage: "archivo requerido" }), result;
+  if (!req.files) {
+    result.error = { menssage: "archivo requerido" };
+    return result;
+  }
 
-  if (validTiopo.indexOf(tipo) < 0)
-    return (result.error = { message: "tipo no valido" }), result;
-  console.log(JSON.stringify(file));
+  if (validTiopo.indexOf(tipo) < 0) {
+    result.error = { message: "tipo no valido" };
+    return result;
+  }
 
-  let nombreCortado = file.name.split(".");
+  const archivo: IFiles = req.files.archivo;
+
+  let nombreCortado = archivo.name.split(".");
   let extencion = nombreCortado[nombreCortado.length - 1];
 
   if (extensionesValidas.indexOf(extencion) < 0)
@@ -23,10 +33,14 @@ export const uploadFile = async (id: number, tipo: string, file: any) => {
 
   let nombreArchivo = `${id}-${new Date().getMilliseconds()}.${extencion}`;
 
-  file.mv(
-    `../docs/upload/${tipo}/${nombreArchivo}`,
-    () => (result.error = { message: "no se pudo crear el archivo" })
-  );
+  await archivo.mv(`src/docs/upload/${tipo}/${nombreArchivo}`, (err: any) => {
+    if (err) {
+      result.ok = false;
+      result.error = err;
+      return;
+    }
+    return (result.ok = true);
+  });
 
   if (tipo === "avatar") {
     await MySql.executeQuery(
@@ -57,4 +71,15 @@ export const uploadFile = async (id: number, tipo: string, file: any) => {
   }
 
   return result;
+};
+
+export const photoVehicle = async (
+  id: number,
+  res: Response,
+  nombreFoto: string
+) => {};
+
+const borrarArchivo = (nombre: string, tipo: string) => {
+  let pathImage = path.resolve(__dirname, `../docs/upload/${tipo}/${nombre}`);
+  if (fs.existsSync(pathImage)) fs.unlinkSync(pathImage);
 };

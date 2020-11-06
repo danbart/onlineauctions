@@ -7,5 +7,5 @@ export interface IFiles {
   truncated: boolean;
   mimetype: string;
   md5: string;
-  mv: () => {};
+  mv: any;
 }

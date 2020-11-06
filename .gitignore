@@ -4,5 +4,5 @@ node_modules/
 
 .vscode/
 
-docs/upload/avatar/*
-docs/upload/vehicle/*
+src/docs/upload/avatar/*
+src/docs/upload/vehicle/*
