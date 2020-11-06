@@ -11,8 +11,6 @@ routerImagen.get("/:tipo/:img", async (req: Request, res: Response) => {
     let img = req.params.img;
 
     let pathImagen = path.resolve(__dirname, `../docs/upload/${tipo}/${img}`);
-    console.log(pathImagen);
-    console.log(fs.existsSync(pathImagen));
 
     if (fs.existsSync(pathImagen)) {
       res.sendFile(pathImagen);
