@@ -32,3 +32,6 @@ routerUser.put(
   [verificaToken, isAdmin, validate(userValidatorUpdate)],
   user.putUser
 );
+routerUser.post("/profile/avatar", verificaToken, user.postAvatar);
+
+routerUser.post("/:id/avatar", [verificaToken, isRegister], user.postAvatar);

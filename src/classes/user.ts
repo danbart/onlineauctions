@@ -7,6 +7,7 @@ import { ModelRole } from "../models/role";
 import { ModelUser } from "../models/user";
 import MySql from "../mysql/mysql";
 import { userLogin } from "../utils/jwt";
+import { uploadFile } from "../utils/upload";
 import { IResponse } from "./interface/IResponse";
 
 export class User {
@@ -257,5 +258,45 @@ export class User {
       result.error = { message: "Usuario y Contraseña erroneo" };
     }
     return res.json(result);
+  };
+
+  postAvatar = async (req: Request, res: Response) => {
+    const result: IResponse = {
+      ok: false,
+    };
+    let userId = req.params.id;
+
+    if (!userId) {
+      await userLogin(req).then((res) => (userId = res));
+    }
+
+    let users: ModelUser[] = [];
+
+    await MySql.executeQuery(
+      `SELECT * FROM user where id_user=${userId} limit 1;`
+    ).then((data: any) => (users = data));
+
+    if (users.length === 0) {
+      result.error = {
+        message: "Usuario no Existe",
+      };
+      return res.status(401).json(result);
+    }
+
+    if (!!users[0].avatar) {
+      result.error = {
+        message: "Usuario ya cuenta con avatar",
+      };
+      return res.status(401).json(result);
+    }
+
+    if (!req.files) {
+      result.error = { menssage: "archivo requerido" };
+      return res.json(result);
+    }
+
+    const resp = await uploadFile(parseInt(userId), "avatar", req);
+
+    res.json(resp);
   };
 }

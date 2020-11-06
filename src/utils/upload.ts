@@ -1,5 +1,7 @@
+import { MD5 } from "crypto-js";
 import { Request, Response } from "express";
 import fs from "fs";
+import moment from "moment";
 import path from "path";
 import { IResponse } from "../classes/interface/IResponse";
 import MySql from "../mysql/mysql";
@@ -31,7 +33,7 @@ export const uploadFile = async (id: number, tipo: string, req: Request) => {
   if (extensionesValidas.indexOf(extencion) < 0)
     return (result.error = { message: "Extensión no valida" });
 
-  let nombreArchivo = `${id}-${new Date().getMilliseconds()}.${extencion}`;
+  let nombreArchivo = `${id}-${MD5(moment().toISOString())}.${extencion}`;
 
   await archivo.mv(`src/docs/upload/${tipo}/${nombreArchivo}`, (err: any) => {
     if (err) {
