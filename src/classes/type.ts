@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
+import { ModelType } from "../models/type";
 import MySql from "../mysql/mysql";
 import { IResponse } from "./interface/IResponse";
-import { ModelType } from "../models/type";
 
 export class Type {
   getSType = async (req: Request, res: Response) => {
@@ -41,7 +41,7 @@ export class Type {
 
     if (types.length === 0) {
       result.error = { message: "Typo no existe" };
-      return res.json(result);
+      return res.status(401).json(result);
     }
 
     try {
@@ -78,7 +78,7 @@ export class Type {
 
     if (types.length > 0) {
       result.error = { message: "El Tipo ya existe" };
-      return res.json(result);
+      return res.status(401).json(result);
     }
 
     !!req.body.type && (type.type = req.body.type);
@@ -117,7 +117,7 @@ export class Type {
 
     if (types.length === 0) {
       result.error = { message: "El Tipo no existe" };
-      return res.json(result);
+      return res.status(401).json(result);
     }
 
     !!req.body.type && (type.type = req.body.type);

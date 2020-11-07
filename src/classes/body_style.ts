@@ -41,7 +41,7 @@ export class BodyStyle {
 
     if (bodyStyles.length === 0) {
       result.error = { message: "Carroceria no existe" };
-      return res.json(result);
+      return res.status(401).json(result);
     }
 
     try {
@@ -78,7 +78,7 @@ export class BodyStyle {
 
     if (bodyStyles.length > 0) {
       result.error = { message: "La Carroceria ya existe" };
-      return res.json(result);
+      return res.status(401).json(result);
     }
 
     !!req.body.style && (bodyStyle.style = req.body.style);
@@ -119,7 +119,7 @@ export class BodyStyle {
 
     if (bodyStyles.length === 0) {
       result.error = { message: "Carrocería no existe" };
-      return res.json(result);
+      return res.status(401).json(result);
     }
 
     !!req.body.style && (bodyStyle.style = req.body.style);

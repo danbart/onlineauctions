@@ -41,7 +41,7 @@ export class Company {
 
     if (companies.length === 0) {
       result.error = { message: "La Compania no existe" };
-      return res.json(result);
+      return res.status(401).json(result);
     }
 
     try {
@@ -78,7 +78,7 @@ export class Company {
 
     if (companies.length > 0) {
       result.error = { message: "La Empresa ya existe" };
-      return res.json(result);
+      return res.status(401).json(result);
     }
 
     !!req.body.name && (company.name = req.body.name);

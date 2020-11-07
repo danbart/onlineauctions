@@ -41,7 +41,7 @@ export class State {
 
     if (states.length === 0) {
       result.error = { message: "Estado no existe" };
-      return res.json(result);
+      return res.status(401).json(result);
     }
 
     try {
@@ -78,7 +78,7 @@ export class State {
 
     if (states.length > 0) {
       result.error = { message: "El estado ya existe" };
-      return res.json(result);
+      return res.status(401).json(result);
     }
 
     !!req.body.state && (state.state = req.body.state);
@@ -119,7 +119,7 @@ export class State {
 
     if (states.length === 0) {
       result.error = { message: "Estado no existe" };
-      return res.json(result);
+      return res.status(401).json(result);
     }
 
     !!req.body.state && (state.state = req.body.state);
