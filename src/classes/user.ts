@@ -2,7 +2,12 @@ import PhoneNumber from "awesome-phonenumber";
 import bcrypt from "bcrypt";
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import { CADUCIDAD_TOKEN, JWT_PRIVATE_KEY } from "../global/environment";
+import moment from "moment";
+import {
+  CADUCIDAD_TOKEN,
+  FORMAT_DATE_TIME,
+  JWT_PRIVATE_KEY,
+} from "../global/environment";
 import { ModelRole } from "../models/role";
 import { ModelUser } from "../models/user";
 import MySql from "../mysql/mysql";
@@ -114,7 +119,7 @@ export class User {
       : (user.last_name = "");
     !!req.body.addres ? (user.addres = req.body.addres) : (user.addres = "");
     !!req.body.email && (user.email = req.body.email);
-    user.active = new Date().toJSON().slice(0, 19).replace("T", " ");
+    user.active = moment().format(FORMAT_DATE_TIME).toString();
     if (!!req.body.phone) {
       const phone = new PhoneNumber(req.body.phone, "GT");
       user.phone = phone.getNumber("e164");

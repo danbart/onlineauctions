@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import moment from "moment";
+import { FORMAT_DATE } from "../global/environment";
 import { ModelBodyStyle } from "../models/bodyStyle";
+import { ModelPhoto } from "../models/photo";
 import { ModelState } from "../models/state";
 import { ModelType } from "../models/type";
 import { ModelVehicle } from "../models/vehicle";
@@ -8,7 +10,6 @@ import MySql from "../mysql/mysql";
 import { userLogin } from "../utils/jwt";
 import { uploadFile } from "../utils/upload";
 import { IResponse } from "./interface/IResponse";
-import { ModelPhoto } from "../models/photo";
 
 export class Vehicle {
   getVehicle = async (req: Request, res: Response) => {
@@ -208,7 +209,7 @@ export class Vehicle {
     !!req.body.model
       ? (vehicle.model = req.body.model + "-01-01")
       : (vehicle.model = moment(vehicles[0].model)
-          .format("YYYY-MM-DD")
+          .format(FORMAT_DATE)
           .toString());
     !!req.body.mileage
       ? (vehicle.mileage = req.body.mileage)

@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import moment from "moment";
+import { FORMAT_DATE_TIME } from "../global/environment";
 import { ModelAccount } from "../models/account";
 import { ModelCredit } from "../models/credit";
 import { ModelCreditCard } from "../models/creditCard";
@@ -149,7 +150,7 @@ export class Account {
     }
 
     !!userId && (account.id_user = parseInt(userId));
-    account.active = moment().format("YYYY-M-D H:mm:ss").toString();
+    account.active = moment().format(FORMAT_DATE_TIME).toString();
     !!req.body.card_number &&
       (creditCard.card_number = (
         await cypher(req.body.card_number)
@@ -222,7 +223,7 @@ export class Account {
       return res.json(result);
     }
 
-    account.deleted_at = moment().format("YYYY-M-D H:mm:ss").toString();
+    account.deleted_at = moment().format(FORMAT_DATE_TIME).toString();
 
     try {
       await MySql.executeQuery(

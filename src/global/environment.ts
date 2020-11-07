@@ -42,3 +42,7 @@ export const CADUCIDAD_TOKEN = process.env.CADUCIDAD_TOKEN || 60 * 60 * 24 * 30;
 // ===============================
 
 export const JWT_PRIVATE_KEY = process.env.JWT_PRIVATE_KEY as string;
+
+export const FORMAT_DATE_TIME = "YYYY-M-D HH:mm:ss";
+
+export const FORMAT_DATE = "YYYY-M-D";
