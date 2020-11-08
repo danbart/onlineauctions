@@ -5,7 +5,7 @@ export class ModelAuction {
   increased_amount: number;
   increased_supply: number;
   sold: number;
-  desciption: string;
+  description: string;
   finished: string;
   active: string;
   id_vehicle: number;
@@ -20,7 +20,7 @@ export class ModelAuction {
     this.increased_amount = 0;
     this.increased_supply = 0;
     this.sold = 0;
-    this.desciption = "";
+    this.description = "";
     this.finished = "";
     this.active = "";
     this.created_at = "";
