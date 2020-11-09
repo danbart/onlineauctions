@@ -385,4 +385,6 @@ export class Auction {
       console.log(error);
     }
   };
+
+  // TODO: falta mis subastas realizadas (actovas e inactivas), mis carros subastados, mis subastas ganadas, mis compras realizadas mis ventas realizadas, opiniones echas,mi ranking
 }
