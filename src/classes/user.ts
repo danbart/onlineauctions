@@ -14,6 +14,8 @@ import MySql from "../mysql/mysql";
 import { userLogin } from "../utils/jwt";
 import { uploadFile } from "../utils/upload";
 import { IResponse } from "./interface/IResponse";
+import { ModelAuctioned } from "../models/auctioned";
+import { ModelVehicle } from "../models/vehicle";
 
 export class User {
   private lista: ModelUser[] = [];
@@ -63,7 +65,7 @@ export class User {
 
     if (users.length === 0) {
       result.error = { message: "Usuario no existe" };
-      return res.json(result);
+      return res.status(401).json(result);
     }
 
     try {
@@ -101,7 +103,7 @@ export class User {
 
     if (rol.length === 0) {
       result.error = { message: "Error en role de ususario" };
-      return res.json(result);
+      return res.status(401).json(result);
     }
 
     await MySql.executeQuery(
@@ -110,7 +112,7 @@ export class User {
 
     if (users.length > 0) {
       result.error = { message: "Email ya existe" };
-      return res.json(result);
+      return res.status(401).json(result);
     }
 
     !!req.body.name && (user.name = req.body.name);
@@ -184,7 +186,7 @@ export class User {
 
     if (users.length === 0) {
       result.error = { message: "Usuario no existe" };
-      return res.json(result);
+      return res.status(401).json(result);
     }
 
     !!req.body.name ? (user.name = req.body.name) : (user.name = users[0].name);
@@ -246,7 +248,7 @@ export class User {
 
     if (users.length === 0) {
       result.error = { message: "Usuario y Contraseña erroneo" };
-      return res.json(result);
+      return res.status(401).json(result);
     }
 
     if (await bcrypt.compare(user.password, Object.values(users)[0].password)) {
@@ -303,5 +305,83 @@ export class User {
     const resp = await uploadFile(parseInt(userId), "avatar", req);
 
     res.json(resp);
+  };
+
+  getProfileAuctioneds = async (req: Request, res: Response) => {
+    const result: IResponse = {
+      ok: false,
+    };
+
+    let userId = 0;
+    await userLogin(req).then((res) => (userId = res));
+
+    let auctioneds: ModelAuctioned[] = [];
+
+    await MySql.executeQuery(
+      `SELECT * FROM auctioned where id_user="${userId}" limit 1;`
+    ).then((data: any) => (auctioneds = data));
+
+    if (auctioneds.length === 0) {
+      result.error = { message: "No ha subastado" };
+      return res.status(401).json(result);
+    }
+
+    try {
+      await MySql.executeQuery(
+        `SELECT * FROM auctioned where id_user=${userId} order by created_at desc;`
+      )
+        .then((data: any) => {
+          result.ok = true;
+          result.data = data;
+        })
+        .catch((err) => {
+          result.ok = false;
+          result.error = err.sqlMessage;
+        });
+
+      res.json(result);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  getProfileVehicles = async (req: Request, res: Response) => {
+    const result: IResponse = {
+      ok: false,
+    };
+
+    let userId = 0;
+    await userLogin(req).then((res) => (userId = res));
+
+    let vehicles: ModelVehicle[] = [];
+
+    await MySql.executeQuery(
+      `SELECT * FROM vehicle where id_user="${userId}" limit 1;`
+    ).then((data: any) => (vehicles = data));
+
+    if (vehicles.length === 0) {
+      result.error = { message: "No Tiene Vehiculos" };
+      return res.status(401).json(result);
+    }
+
+    try {
+      await MySql.executeQuery(
+        `SELECT v.*, s.state, bs.style, t.type 
+        FROM vehicle v INNER JOIN state s on v.id_state=s.id_state INNER JOIN body_style bs on v.id_body_style=bs.id_body_style
+        INNER JOIN type t on v.id_type=t.id_type where v.id_user=${userId} order by v.created_at desc;`
+      )
+        .then((data: any) => {
+          result.ok = true;
+          result.data = data;
+        })
+        .catch((err) => {
+          result.ok = false;
+          result.error = err.sqlMessage;
+        });
+
+      res.json(result);
+    } catch (error) {
+      console.log(error);
+    }
   };
 }

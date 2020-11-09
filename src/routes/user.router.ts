@@ -16,6 +16,8 @@ const user = new User();
 
 routerUser.get("/", [verificaToken, isRegister], user.getUsers);
 routerUser.get("/profile", verificaToken, user.getUserId);
+routerUser.get("/profile/vehicle", verificaToken, user.getProfileVehicles);
+routerUser.get("/profile/auctioned", verificaToken, user.getProfileAuctioneds);
 routerUser.get("/:id", [verificaToken, isRegister], user.getUserId);
 routerUser.post(
   "/",
