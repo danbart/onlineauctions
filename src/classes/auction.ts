@@ -228,7 +228,7 @@ export class Auction {
 
     if (auctions.length === 0) {
       result.error = { message: "Subasta no existe" };
-      return res.json(result);
+      return res.status(401).json(result);
     }
 
     try {
@@ -277,7 +277,7 @@ export class Auction {
 
     if (auctioneds.length === 0) {
       result.error = { message: "Subasta no existe o ha sido cancelada" };
-      return res.json(result);
+      return res.status(401).json(result);
     }
 
     try {
@@ -312,6 +312,8 @@ export class Auction {
 
     let auctioneds: ModelAuctioned[] = [];
 
+    let vehicles: ModelVehicle[] = [];
+
     let userId = 0;
     await userLogin(req).then((res) => (userId = res));
 
@@ -321,14 +323,33 @@ export class Auction {
 
     if (auctions.length === 0) {
       result.error = { message: "Subasta no existe" };
-      return res.json(result);
+      return res.status(401).json(result);
     }
 
     await MySql.executeQuery(
-      `select max(amount) as amount from auctioned where id_auction="${auctionId}" limit 1;`
+      `SELECT v.* FROM auction au inner join vehicle v on au.id_vehicle=v.id_vehicle where au.id_auction="${auctionId}" and v.id_user=${userId} limit 1;`
+    ).then((data: any) => (vehicles = data));
+
+    if (vehicles.length > 0) {
+      result.error = { message: "No puede subastar su propio vehiculo" };
+      return res.status(401).json(result);
+    }
+
+    await MySql.executeQuery(
+      `select max(amount) as amount from auctioned where id_auction="${auctionId}" and cancelled is null limit 1;`
     ).then((data: any) => (auctioneds = data));
 
     !!req.body.amount && (auctioned.amount = req.body.amount);
+
+    if (
+      moment(auctions[0].auction_date).diff(moment()) <= 0 ||
+      !!auctions[0].finished
+    ) {
+      result.error = {
+        message: "No puede subastar por que la subasta ha caducado",
+      };
+      return res.status(401).json(result);
+    }
 
     if (
       auctioneds.length > 0 &&
@@ -339,7 +360,7 @@ export class Auction {
           "El monto a subastar tiene que ser mayor ultimo monto ofertado " +
           auctioneds[0].amount,
       };
-      return res.json(result);
+      return res.status(401).json(result);
     }
 
     if (
@@ -386,5 +407,5 @@ export class Auction {
     }
   };
 
-  // TODO: falta mis subastas realizadas (actovas e inactivas), mis carros subastados, mis subastas ganadas, mis compras realizadas mis ventas realizadas, opiniones echas,mi ranking
+  // TODO: mis subastas ganadas, mis compras realizadas mis ventas realizadas, opiniones echas,mi ranking
 }
