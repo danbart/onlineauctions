@@ -13,3 +13,10 @@ export const auctionValidatorUpdate = {
     increased_amount: Joi.number().min(1).required(),
   }),
 };
+
+export const auctionedValidator = {
+  body: Joi.object({
+    amount: Joi.number().min(1).required(),
+    description: Joi.string().required(),
+  }),
+};

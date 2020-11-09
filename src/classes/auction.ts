@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import moment from "moment";
 import { FORMAT_DATE_TIME } from "../global/environment";
 import { ModelAuction } from "../models/auction";
+import { ModelAuctioned } from "../models/auctioned";
 import { ModelPhoto } from "../models/photo";
 import { ModelVehicle } from "../models/vehicle";
 import MySql from "../mysql/mysql";
@@ -237,6 +238,142 @@ export class Auction {
         .then((data: any) => {
           result.ok = true;
           result.data = data;
+        })
+        .catch((err) => {
+          result.ok = false;
+          result.error = err.sqlMessage;
+        });
+
+      res.json(result);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  getAuctionIdAuctionedId = async (req: Request, res: Response) => {
+    const result: IResponse = {
+      ok: false,
+    };
+
+    const auctionId = req.params.idAuction;
+
+    const auctionedId = req.params.idAuctioned;
+
+    let auctions: ModelAuction[] = [];
+    let auctioneds: ModelAuctioned[] = [];
+
+    await MySql.executeQuery(
+      `SELECT * FROM auction where id_auction="${auctionId}" limit 1;`
+    ).then((data: any) => (auctions = data));
+
+    if (auctions.length === 0) {
+      result.error = { message: "Subasta no existe" };
+      return res.json(result);
+    }
+
+    await MySql.executeQuery(
+      `SELECT * FROM auctioned where id_auctioned="${auctionedId}" and cancelled is null limit 1;`
+    ).then((data: any) => (auctioneds = data));
+
+    if (auctioneds.length === 0) {
+      result.error = { message: "Subasta no existe o ha sido cancelada" };
+      return res.json(result);
+    }
+
+    try {
+      await MySql.executeQuery(
+        `SELECT * FROM auctioned where id_auction=${auctionId} and cancelled is null;`
+      )
+        .then((data: any) => {
+          result.ok = true;
+          result.data = data;
+        })
+        .catch((err) => {
+          result.ok = false;
+          result.error = err.sqlMessage;
+        });
+
+      res.json(result);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  postAuctionIdAuctioned = async (req: Request, res: Response) => {
+    const result: IResponse = {
+      ok: false,
+    };
+
+    const auctionId = req.params.id;
+
+    let auctions: ModelAuction[] = [];
+
+    const auctioned = new ModelAuctioned();
+
+    let auctioneds: ModelAuctioned[] = [];
+
+    let userId = 0;
+    await userLogin(req).then((res) => (userId = res));
+
+    await MySql.executeQuery(
+      `SELECT * FROM auction where id_auction="${auctionId}" limit 1;`
+    ).then((data: any) => (auctions = data));
+
+    if (auctions.length === 0) {
+      result.error = { message: "Subasta no existe" };
+      return res.json(result);
+    }
+
+    await MySql.executeQuery(
+      `select max(amount) as amount from auctioned where id_auction="${auctionId}" limit 1;`
+    ).then((data: any) => (auctioneds = data));
+
+    !!req.body.amount && (auctioned.amount = req.body.amount);
+
+    if (
+      auctioneds.length > 0 &&
+      parseInt(auctioneds[0].amount) >= parseInt(auctioned.amount)
+    ) {
+      result.error = {
+        message:
+          "El monto a subastar tiene que ser mayor ultimo monto ofertado " +
+          auctioneds[0].amount,
+      };
+      return res.json(result);
+    }
+
+    if (
+      !!auctions[0].increased_amount &&
+      auctions[0].increased_amount > parseInt(auctioned.amount)
+    ) {
+      result.error = {
+        message:
+          "El monto a subastar tiene que ser mayor al indicado por el cliente " +
+          auctions[0].increased_amount,
+      };
+      return res.status(401).json(result);
+    }
+
+    if (auctions[0].initial_amount > parseInt(auctioned.amount)) {
+      result.error = {
+        message:
+          "El monto a subastar tiene que ser mayor al indicado por el cliente " +
+          auctions[0].initial_amount,
+      };
+      return res.status(401).json(result);
+    }
+    !!req.body.description
+      ? (auctioned.description = req.body.description)
+      : (auctioned.description = "");
+
+    try {
+      await MySql.executeQuery(
+        `INSERT INTO auctioned(amount,description,id_auction,id_user) 
+        VALUES(${auctioned.amount}, "${auctioned.description}", ${auctionId}, ${userId});`
+      )
+        .then((data: any) => {
+          result.ok = true;
+          result.data = [{ auctionedId: data.insertId }];
         })
         .catch((err) => {
           result.ok = false;

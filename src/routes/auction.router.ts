@@ -3,6 +3,7 @@ import { validate } from "express-validation";
 import { Auction } from "../classes/auction";
 import { verificaToken } from "../middlewares/autentication";
 import {
+  auctionedValidator,
   auctionValidator,
   auctionValidatorUpdate,
 } from "../middlewares/validatorsAuction";
@@ -13,8 +14,6 @@ const auction = new Auction();
 routerAuction.get("/", auction.getAuction);
 
 routerAuction.get("/:id", auction.getAuctionId);
-
-routerAuction.get("/:id/auctioned", auction.getAuctionIdAuctioned);
 
 routerAuction.post(
   "/vehicle/:id",
@@ -28,4 +27,18 @@ routerAuction.put(
   verificaToken,
   validate(auctionValidatorUpdate),
   auction.putAuctionIncrementAmount
+);
+
+routerAuction.get("/:id/auctioned", auction.getAuctionIdAuctioned);
+
+routerAuction.get(
+  "/:idAuction/auctioned/:idAuctioned",
+  auction.getAuctionIdAuctionedId
+);
+
+routerAuction.post(
+  "/:id/auctioned",
+  verificaToken,
+  validate(auctionedValidator),
+  auction.postAuctionIdAuctioned
 );
