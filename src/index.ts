@@ -1,13 +1,13 @@
 import bodyParser from "body-parser";
 import cors from "cors";
 import { Request, Response } from "express";
+import fileUpload from "express-fileupload";
 import { ValidationError } from "express-validation";
 import * as pkg from "../package.json";
 import { createAdmin, createRoles } from "./lib/initialSetup";
 import MySql from "./mysql/mysql";
 import router from "./routes/router";
 import Server from "./server/server";
-import fileUpload from "express-fileupload";
 
 const server = Server.instance;
 
@@ -29,7 +29,7 @@ server.app.use(fileUpload());
 // Rutas
 server.app.use("/api/", router);
 server.app.set("pkg", pkg);
-server.app.get("/", (req: Request, res: Response) =>
+server.app.get("/api/", (req: Request, res: Response) =>
   res.json({
     message: "Welcome to my API",
     name: server.app.get("pkg").name,
