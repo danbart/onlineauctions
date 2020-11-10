@@ -247,7 +247,7 @@ export class User {
     ).then((data: any) => (users = data));
 
     if (users.length === 0) {
-      result.error = { message: "Usuario y Contraseña erroneo" };
+      result.error = { message: "Usuario y Contraseña erróneo" };
       return res.status(401).json(result);
     }
 
@@ -262,7 +262,7 @@ export class User {
       result.data = [{ token: token }];
       result.ok = true;
     } else {
-      result.error = { message: "Usuario y Contraseña erroneo" };
+      result.error = { message: "Usuario y Contraseña erróneo" };
     }
     return res.json(result);
   };
