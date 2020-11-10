@@ -15,6 +15,8 @@ export const SERVER_PORT: number = Number(process.env.SERVER_PORT) || 5000;
 
 export const SERVER_HOSTNAME: string = process.env.DB_HOST || "localhost";
 
+export const DB_PORT: number = Number(process.env.DB_PORT) || 3306;
+
 export const SERVER_USER: string = process.env.DB_USER || "root";
 
 export const SERVER_PASSWORD: string = process.env.DB_PASS || "";

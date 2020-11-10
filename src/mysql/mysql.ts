@@ -1,11 +1,12 @@
+import util from "util";
 import {
+  DB_PORT,
   SERVER_DATABASE,
   SERVER_HOSTNAME,
   SERVER_PASSWORD,
   SERVER_USER,
 } from "../global/environment";
 import mysql = require("mysql");
-import util  from 'util'
 
 export default class MySql {
   private static _instance: MySql;
@@ -17,6 +18,7 @@ export default class MySql {
     // para la conección se llaman las variables de entorno
     this.cnn = mysql.createConnection({
       host: SERVER_HOSTNAME,
+      port: DB_PORT,
       user: SERVER_USER,
       password: SERVER_PASSWORD,
       database: SERVER_DATABASE,
@@ -32,8 +34,9 @@ export default class MySql {
 
   // funcion par ahacer consultas
   static async executeQuery(query: string) {
-    return util.promisify(this.instances.cnn.query)
-    .call(this.instances.cnn, query);
+    return util
+      .promisify(this.instances.cnn.query)
+      .call(this.instances.cnn, query);
   }
 
   // conectar base de datos
