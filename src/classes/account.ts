@@ -27,7 +27,7 @@ export class Account {
     let accounts: ModelAccount[] = [];
 
     await MySql.executeQuery(
-      `SELECT * FROM account where id_user="${userId}";`
+      `SELECT * FROM account where id_user='${userId}';`
     ).then((data: any) => (accounts = data));
 
     if (accounts.length === 0) {
@@ -72,7 +72,7 @@ export class Account {
     let users: ModelUser[] = [];
 
     await MySql.executeQuery(
-      `SELECT * FROM user where id_user="${userId}";`
+      `SELECT * FROM user where id_user=${userId};`
     ).then((data: any) => (users = data));
 
     if (users.length === 0) {
@@ -83,7 +83,7 @@ export class Account {
     }
 
     await MySql.executeQuery(
-      `SELECT * FROM account where id_user="${userId}" and  id_account=${accountId};`
+      `SELECT * FROM account where id_user=${userId} and  id_account=${accountId};`
     ).then((data: any) => (accounts = data));
 
     if (accounts.length === 0) {
@@ -128,7 +128,7 @@ export class Account {
     let userId = req.params.id;
 
     await MySql.executeQuery(
-      `SELECT * FROM user where id_user="${userId}";`
+      `SELECT * FROM user where id_user=${userId};`
     ).then((data: any) => (users = data));
 
     if (users.length === 0) {
@@ -139,7 +139,7 @@ export class Account {
     }
 
     await MySql.executeQuery(
-      `SELECT * FROM account where id_user="${userId}" and active is not null;`
+      `SELECT * FROM account where id_user=${userId} and active is not null;`
     ).then((data: any) => (accounts = data));
 
     if (accounts.length > 0) {
@@ -170,14 +170,14 @@ export class Account {
 
     try {
       await MySql.executeQuery(
-        `INSERT INTO account(id_user, active) VALUES(${account.id_user}, "${account.active}" );`
+        `INSERT INTO account(id_user, active) VALUES(${account.id_user}, '${account.active}' );`
       )
         .then(async (data: any) => {
           result.ok = true;
           result.data = [{ accountId: data.insertId }];
           await MySql.executeQuery(
             `INSERT INTO credit_card(card_number, expiration_date, cvc_code, id_account)
-            values("${creditCard.card_number}", "${creditCard.expiration_date}", "${creditCard.cvc_code}", ${data.insertId});`
+            values('${creditCard.card_number}', '${creditCard.expiration_date}', '${creditCard.cvc_code}', ${data.insertId});`
           );
         })
         .catch((err) => {
@@ -204,7 +204,7 @@ export class Account {
     let accounts: ModelAccount[] = [];
 
     await MySql.executeQuery(
-      `SELECT * FROM user where id_user="${userId}";`
+      `SELECT * FROM user where id_user=${userId};`
     ).then((data: any) => (users = data));
 
     if (users.length === 0) {
@@ -215,7 +215,7 @@ export class Account {
     }
 
     await MySql.executeQuery(
-      `SELECT * FROM account where id_account="${accountId}" limit 1;`
+      `SELECT * FROM account where id_account=${accountId} limit 1;`
     ).then((data: any) => (accounts = data));
 
     if (accounts.length === 0) {
@@ -227,7 +227,7 @@ export class Account {
 
     try {
       await MySql.executeQuery(
-        `Update account set deleted_at="${account.deleted_at}", active=null where id_account=${accountId} and id_user=${userId};`
+        `Update account set deleted_at='${account.deleted_at}', active=null where id_account=${accountId} and id_user=${userId};`
       )
         .then((data: any) => {
           result.ok = true;
@@ -259,7 +259,7 @@ export class Account {
     let accountId = req.params.idAccount;
 
     await MySql.executeQuery(
-      `SELECT * FROM user where id_user="${userId}";`
+      `SELECT * FROM user where id_user=${userId};`
     ).then((data: any) => (users = data));
 
     if (users.length === 0) {
@@ -270,7 +270,7 @@ export class Account {
     }
 
     await MySql.executeQuery(
-      `SELECT * FROM account where id_user="${userId}" and id_account=${accountId} and active is not null;`
+      `SELECT * FROM account where id_user=${userId} and id_account=${accountId} and active is not null;`
     ).then((data: any) => (accounts = data));
 
     if (accounts.length === 0) {
@@ -281,7 +281,7 @@ export class Account {
     }
 
     await MySql.executeQuery(
-      `SELECT * FROM credit_card where id_account="${accountId}";`
+      `SELECT * FROM credit_card where id_account=${accountId};`
     ).then((data: any) => (creditCards = data));
 
     const card_number = (await cypher(req.body.card_number)).toString();
@@ -321,7 +321,7 @@ export class Account {
     try {
       await MySql.executeQuery(
         `INSERT INTO credit_card(card_number, expiration_date, cvc_code, id_account)
-            values("${creditCard.card_number}", "${creditCard.expiration_date}", "${creditCard.cvc_code}", ${accountId});`
+            values('${creditCard.card_number}', '${creditCard.expiration_date}', '${creditCard.cvc_code}', ${accountId});`
       )
         .then(async (data: any) => {
           result.ok = true;
@@ -351,7 +351,7 @@ export class Account {
     let accountId = req.params.idAccount;
 
     await MySql.executeQuery(
-      `SELECT * FROM user where id_user="${userId}";`
+      `SELECT * FROM user where id_user=${userId};`
     ).then((data: any) => (users = data));
 
     if (users.length === 0) {
@@ -362,7 +362,7 @@ export class Account {
     }
 
     await MySql.executeQuery(
-      `SELECT * FROM account where id_user="${userId}" and id_account=${accountId} and active is not null;`
+      `SELECT * FROM account where id_user=${userId} and id_account=${accountId} and active is not null;`
     ).then((data: any) => (accounts = data));
 
     if (accounts.length === 0) {
@@ -379,7 +379,7 @@ export class Account {
     try {
       await MySql.executeQuery(
         `INSERT INTO credit(amount, reason, paid_type, id_account)
-            values("${credit.amount}", "${credit.reason}", "${credit.paid_type}", ${accountId});`
+            values('${credit.amount}', '${credit.reason}', '${credit.paid_type}', ${accountId});`
       )
         .then(async (data: any) => {
           result.ok = true;
@@ -409,7 +409,7 @@ export class Account {
     let accountId = req.params.idAccount;
 
     await MySql.executeQuery(
-      `SELECT * FROM user where id_user="${userId}";`
+      `SELECT * FROM user where id_user=${userId};`
     ).then((data: any) => (users = data));
 
     if (users.length === 0) {
@@ -420,7 +420,7 @@ export class Account {
     }
 
     await MySql.executeQuery(
-      `SELECT * FROM account where id_user="${userId}" and id_account=${accountId} and active is not null;`
+      `SELECT * FROM account where id_user=${userId} and id_account=${accountId} and active is not null;`
     ).then((data: any) => (accounts = data));
 
     if (accounts.length === 0) {
@@ -448,7 +448,7 @@ export class Account {
     try {
       await MySql.executeQuery(
         `INSERT INTO debt(amount, reason, id_account)
-            values("${debt.amount}", "${debt.reason}", ${accountId});`
+            values('${debt.amount}', '${debt.reason}', ${accountId});`
       )
         .then(async (data: any) => {
           result.ok = true;
@@ -480,7 +480,7 @@ export class Account {
     }
 
     await MySql.executeQuery(
-      `SELECT * FROM user where id_user="${userId}";`
+      `SELECT * FROM user where id_user='${userId}';`
     ).then((data: any) => (users = data));
 
     if (users.length === 0) {
@@ -491,7 +491,7 @@ export class Account {
     }
 
     await MySql.executeQuery(
-      `SELECT * FROM account where id_user="${userId}" and id_account=${accountId} and active is not null;`
+      `SELECT * FROM account where id_user=${userId} and id_account=${accountId} and active is not null;`
     ).then((data: any) => (accounts = data));
 
     if (accounts.length === 0) {
@@ -531,7 +531,7 @@ export class Account {
     }
 
     await MySql.executeQuery(
-      `SELECT * FROM user where id_user="${userId}";`
+      `SELECT * FROM user where id_user=${userId};`
     ).then((data: any) => (users = data));
 
     if (users.length === 0) {
@@ -542,7 +542,7 @@ export class Account {
     }
 
     await MySql.executeQuery(
-      `SELECT * FROM account where id_user="${userId}" and id_account=${accountId} and active is not null;`
+      `SELECT * FROM account where id_user=${userId} and id_account=${accountId} and active is not null;`
     ).then((data: any) => (accounts = data));
 
     if (accounts.length === 0) {
@@ -583,7 +583,7 @@ export class Account {
     }
 
     await MySql.executeQuery(
-      `SELECT * FROM user where id_user="${userId}";`
+      `SELECT * FROM user where id_user=${userId};`
     ).then((data: any) => (users = data));
 
     if (users.length === 0) {
@@ -594,7 +594,7 @@ export class Account {
     }
 
     await MySql.executeQuery(
-      `SELECT * FROM account where id_user="${userId}" and id_account=${accountId} and active is not null;`
+      `SELECT * FROM account where id_user=${userId} and id_account=${accountId} and active is not null;`
     ).then((data: any) => (accounts = data));
 
     if (accounts.length === 0) {

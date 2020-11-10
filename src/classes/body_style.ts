@@ -36,7 +36,7 @@ export class BodyStyle {
     let bodyStyles: ModelBodyStyle[] = [];
 
     await MySql.executeQuery(
-      `SELECT * FROM body_style where id_body_style="${bodyStyleId}" limit 1;`
+      `SELECT * FROM body_style where id_body_style=${bodyStyleId} limit 1;`
     ).then((data: any) => (bodyStyles = data));
 
     if (bodyStyles.length === 0) {
@@ -46,7 +46,7 @@ export class BodyStyle {
 
     try {
       await MySql.executeQuery(
-        `SELECT * FROM body_style where id_body_style="${bodyStyleId}" limit 1`
+        `SELECT * FROM body_style where id_body_style=${bodyStyleId} limit 1`
       )
         .then((data: any) => {
           result.ok = true;
@@ -73,7 +73,7 @@ export class BodyStyle {
     let bodyStyles: ModelBodyStyle[] = [];
 
     await MySql.executeQuery(
-      `SELECT * FROM body_style where style="${req.body.style}" limit 1;`
+      `SELECT * FROM body_style where style='${req.body.style}' limit 1;`
     ).then((data: any) => (bodyStyles = data));
 
     if (bodyStyles.length > 0) {
@@ -85,7 +85,7 @@ export class BodyStyle {
 
     try {
       await MySql.executeQuery(
-        `INSERT INTO body_style(style) VALUES("${bodyStyle.style}")`
+        `INSERT INTO body_style(style) VALUES('${bodyStyle.style}')`
       )
         .then((data: any) => {
           result.ok = true;
@@ -114,7 +114,7 @@ export class BodyStyle {
     let bodyStyles: ModelBodyStyle[] = [];
 
     await MySql.executeQuery(
-      `SELECT * FROM body_style where id_body_style="${bodyStyleId}" limit 1;`
+      `SELECT * FROM body_style where id_body_style=${bodyStyleId} limit 1;`
     ).then((data: any) => (bodyStyles = data));
 
     if (bodyStyles.length === 0) {
@@ -126,7 +126,7 @@ export class BodyStyle {
 
     try {
       await MySql.executeQuery(
-        `Update body_style set style="${bodyStyle.style}" where id_body_style=${bodyStyleId};`
+        `Update body_style set style='${bodyStyle.style}' where id_body_style=${bodyStyleId};`
       )
         .then((data: any) => {
           result.ok = true;

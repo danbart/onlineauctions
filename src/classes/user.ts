@@ -8,14 +8,14 @@ import {
   FORMAT_DATE_TIME,
   JWT_PRIVATE_KEY,
 } from "../global/environment";
+import { ModelAuctioned } from "../models/auctioned";
 import { ModelRole } from "../models/role";
 import { ModelUser } from "../models/user";
+import { ModelVehicle } from "../models/vehicle";
 import MySql from "../mysql/mysql";
 import { userLogin } from "../utils/jwt";
 import { uploadFile } from "../utils/upload";
 import { IResponse } from "./interface/IResponse";
-import { ModelAuctioned } from "../models/auctioned";
-import { ModelVehicle } from "../models/vehicle";
 
 export class User {
   private lista: ModelUser[] = [];
@@ -29,7 +29,7 @@ export class User {
 
     try {
       await MySql.executeQuery(
-        `SELECT id_user, name,last_name,email,address,phone,active,avatar,web_site,facebook,twitter,remember_token, created_at, updated_at FROM user`
+        `SELECT id_user, name,last_name,email,address,phone,active,avatar,web_site,facebook,twitter,remember_token, created_at, updated_at FROM user;`
       )
         .then((data: any) => {
           result.ok = true;
@@ -60,7 +60,7 @@ export class User {
     let users: ModelUser[] = [];
 
     await MySql.executeQuery(
-      `SELECT * FROM user where id_user="${userId}" limit 1;`
+      `SELECT * FROM user where id_user=${userId} limit 1;`
     ).then((data: any) => (users = data));
 
     if (users.length === 0) {
@@ -70,7 +70,7 @@ export class User {
 
     try {
       await MySql.executeQuery(
-        `SELECT id_user, name,last_name,email,address,phone,active,avatar,web_site,facebook,twitter,remember_token, created_at, updated_at FROM user where id_user=${userId}`
+        `SELECT id_user, name,last_name,email,address,phone,active,avatar,web_site,facebook,twitter,remember_token, created_at, updated_at FROM user where id_user=${userId};`
       )
         .then((data: any) => {
           result.ok = true;
@@ -97,7 +97,7 @@ export class User {
     let users: ModelUser[] = [];
     let rol: ModelRole[] = [];
 
-    await MySql.executeQuery(`SELECT * FROM role where role="users";`).then(
+    await MySql.executeQuery(`SELECT * FROM role where role='users';`).then(
       (data: any) => (rol = data)
     );
 
@@ -107,7 +107,7 @@ export class User {
     }
 
     await MySql.executeQuery(
-      `SELECT * FROM user where email="${req.body.email}" limit 1;`
+      `SELECT * FROM user where email='${req.body.email}' limit 1;`
     ).then((data: any) => (users = data));
 
     if (users.length > 0) {
@@ -142,15 +142,15 @@ export class User {
     try {
       await MySql.executeQuery(
         `INSERT INTO user(name,last_name,email, password,address,phone,active,avatar,web_site,facebook,twitter) 
-        VALUES("${user.name}", "${user.last_name}", "${user.email}", "${user.password}", "${user.addres}", "${user.phone}", "${user.active}", "${user.avatar}", "${user.web_site}",
-                "${user.facebook}", "${user.twitter}" )`
+        VALUES('${user.name}', '${user.last_name}', '${user.email}', '${user.password}', '${user.addres}', '${user.phone}', '${user.active}', '${user.avatar}', '${user.web_site}',
+                '${user.facebook}', '${user.twitter}' );`
       )
         .then((data: any) => {
           result.ok = true;
           result.data = [{ userId: data.insertId }];
           rol.forEach(async (val: ModelRole) => {
             await MySql.executeQuery(
-              `INSERT INTO role_user(id_user,id_role) VALUES("${data.insertId}", "${val.id_role}")`
+              `INSERT INTO role_user(id_user,id_role) VALUES(${data.insertId}, ${val.id_role});`
             );
           });
         })
@@ -181,7 +181,7 @@ export class User {
     let users: ModelUser[] = [];
 
     await MySql.executeQuery(
-      `SELECT * FROM user where id_user="${userId}" limit 1;`
+      `SELECT * FROM user where id_user=${userId} limit 1;`
     ).then((data: any) => (users = data));
 
     if (users.length === 0) {
@@ -212,8 +212,8 @@ export class User {
 
     try {
       await MySql.executeQuery(
-        `UPDATE user SET name="${user.name}",last_name="${user.last_name}", address="${user.addres}",phone="${user.phone}",
-        web_site="${user.web_site}",facebook="${user.facebook}",twitter="${user.twitter}" where id_user=${userId};`
+        `UPDATE user SET name='${user.name}',last_name='${user.last_name}', address='${user.addres}',phone='${user.phone}',
+        web_site='${user.web_site}',facebook='${user.facebook}',twitter='${user.twitter}' where id_user=${userId};`
       )
         .then((data: any) => {
           result.ok = true;
@@ -243,7 +243,7 @@ export class User {
     let users: ModelUser[] = [];
 
     await MySql.executeQuery(
-      `SELECT id_user, email, password FROM user where email="${user.email}" limit 1;`
+      `SELECT id_user, email, password FROM user where email='${user.email}' limit 1;`
     ).then((data: any) => (users = data));
 
     if (users.length === 0) {
@@ -318,7 +318,7 @@ export class User {
     let auctioneds: ModelAuctioned[] = [];
 
     await MySql.executeQuery(
-      `SELECT * FROM auctioned where id_user="${userId}" limit 1;`
+      `SELECT * FROM auctioned where id_user=${userId} limit 1;`
     ).then((data: any) => (auctioneds = data));
 
     if (auctioneds.length === 0) {
@@ -356,7 +356,7 @@ export class User {
     let vehicles: ModelVehicle[] = [];
 
     await MySql.executeQuery(
-      `SELECT * FROM vehicle where id_user="${userId}" limit 1;`
+      `SELECT * FROM vehicle where id_user=${userId} limit 1;`
     ).then((data: any) => (vehicles = data));
 
     if (vehicles.length === 0) {

@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
+import { ModelOpinion } from "../models/opinion";
 import { ModelVehicle } from "../models/vehicle";
 import MySql from "../mysql/mysql";
-import { IResponse } from "./interface/IResponse";
-import { ModelOpinion } from "../models/opinion";
 import { userLogin } from "../utils/jwt";
+import { IResponse } from "./interface/IResponse";
 
 export class Opinion {
   getOpinion = async (req: Request, res: Response) => {
@@ -16,7 +16,7 @@ export class Opinion {
     let veicles: ModelVehicle[] = [];
 
     await MySql.executeQuery(
-      `SELECT * FROM vehicle where id_vehicle="${vehicleId}" limit 1;`
+      `SELECT * FROM vehicle where id_vehicle=${vehicleId} limit 1;`
     ).then((data: any) => (veicles = data));
 
     if (veicles.length === 0) {
@@ -57,7 +57,7 @@ export class Opinion {
     let veicles: ModelVehicle[] = [];
 
     await MySql.executeQuery(
-      `SELECT * FROM vehicle where id_vehicle="${vehicleId}" limit 1;`
+      `SELECT * FROM vehicle where id_vehicle=${vehicleId} limit 1;`
     ).then((data: any) => (veicles = data));
 
     if (veicles.length === 0) {
@@ -66,7 +66,7 @@ export class Opinion {
     }
 
     await MySql.executeQuery(
-      `SELECT * FROM opinion where id_opinion="${opinionId}" limit 1;`
+      `SELECT * FROM opinion where id_opinion=${opinionId} limit 1;`
     ).then((data: any) => (opinions = data));
 
     if (opinions.length === 0) {
@@ -79,7 +79,7 @@ export class Opinion {
         `SELECT op.*, u.name as opinado_name, u.last_name as opinado_last_name, us.name as opino_name, us.last_name as opino_last_name 
         FROM opinion op inner join user u on op.id_user_opined=u.id_user
         inner join user us on op.id_user_say=us.id_user 
-        where id_opinion="${opinionId}" limit 1;`
+        where id_opinion=${opinionId} limit 1;`
       )
         .then((data: any) => {
           result.ok = true;
@@ -113,7 +113,7 @@ export class Opinion {
     await userLogin(req).then((res) => (userId = res));
 
     await MySql.executeQuery(
-      `SELECT * FROM vehicle where id_vehicle="${vehicleId}" limit 1;`
+      `SELECT * FROM vehicle where id_vehicle=${vehicleId} limit 1;`
     ).then((data: any) => (veicles = data));
 
     if (veicles.length === 0) {
@@ -143,7 +143,7 @@ export class Opinion {
     try {
       await MySql.executeQuery(
         `INSERT INTO opinion(opinion, rating, id_vehicle, id_user_opined, id_user_say) 
-        VALUES("${opinion.opinion}", ${opinion.rating}, ${vehicleId}, ${veicles[0].id_user}, ${userId});`
+        VALUES('${opinion.opinion}', ${opinion.rating}, ${vehicleId}, ${veicles[0].id_user}, ${userId});`
       )
         .then((data: any) => {
           result.ok = true;
@@ -179,7 +179,7 @@ export class Opinion {
     await userLogin(req).then((res) => (userId = res));
 
     await MySql.executeQuery(
-      `SELECT * FROM vehicle where id_vehicle="${vehicleId}" limit 1;`
+      `SELECT * FROM vehicle where id_vehicle=${vehicleId} limit 1;`
     ).then((data: any) => (veicles = data));
 
     if (veicles.length === 0) {
@@ -205,7 +205,7 @@ export class Opinion {
 
     try {
       await MySql.executeQuery(
-        `Update opinion set opinion="${opinion.opinion}", rating=${opinion.rating} where id_opinion=${opinionId};`
+        `Update opinion set opinion='${opinion.opinion}', rating=${opinion.rating} where id_opinion=${opinionId};`
       )
         .then((data: any) => {
           result.ok = true;

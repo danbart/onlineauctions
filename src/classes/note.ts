@@ -15,7 +15,7 @@ export class Note {
     let notes: ModelNote[] = [];
 
     await MySql.executeQuery(
-      `SELECT * FROM note where id_vehicle="${vehicleId}" limit 1;`
+      `SELECT * FROM note where id_vehicle=${vehicleId} limit 1;`
     ).then((data: any) => (notes = data));
 
     if (notes.length === 0) {
@@ -25,7 +25,7 @@ export class Note {
 
     try {
       await MySql.executeQuery(
-        `SELECT * FROM note where id_vehicle=${vehicleId}`
+        `SELECT * FROM note where id_vehicle=${vehicleId};`
       )
         .then((data: any) => {
           result.ok = true;
@@ -54,7 +54,7 @@ export class Note {
     let notes: ModelNote[] = [];
 
     await MySql.executeQuery(
-      `SELECT * FROM note where id_vehicle="${vehicleId}" limit 1;`
+      `SELECT * FROM note where id_vehicle=${vehicleId} limit 1;`
     ).then((data: any) => (vehicles = data));
 
     if (vehicles.length === 0) {
@@ -63,7 +63,7 @@ export class Note {
     }
 
     await MySql.executeQuery(
-      `SELECT * FROM note where id_note="${noteId}" limit 1;`
+      `SELECT * FROM note where id_note='${noteId}' limit 1;`
     ).then((data: any) => (notes = data));
 
     if (notes.length === 0) {
@@ -73,7 +73,7 @@ export class Note {
 
     try {
       await MySql.executeQuery(
-        `SELECT * FROM note where id_note="${noteId}" limit 1`
+        `SELECT * FROM note where id_note='${noteId}' limit 1`
       )
         .then((data: any) => {
           result.ok = true;
@@ -102,7 +102,7 @@ export class Note {
     let notes: ModelNote[] = [];
 
     await MySql.executeQuery(
-      `SELECT * FROM vehicle where id_vehicle="${vehicleId}" and id_user="${userId}" limit 1;`
+      `SELECT * FROM vehicle where id_vehicle=${vehicleId} and id_user=${userId} limit 1;`
     ).then((data: any) => (notes = data));
 
     if (notes.length === 0) {
@@ -117,7 +117,7 @@ export class Note {
 
     try {
       await MySql.executeQuery(
-        `INSERT INTO note(note, id_vehicle) VALUES("${note.note}", ${note.id_vehicle})`
+        `INSERT INTO note(note, id_vehicle) VALUES('${note.note}', ${note.id_vehicle});`
       )
         .then((data: any) => {
           result.ok = true;
@@ -150,8 +150,8 @@ export class Note {
 
     await MySql.executeQuery(
       `SELECT * FROM note inner join vehicle on 
-      vehicle.id_vehicle=note.id_vehicle where vehicle.id_vehicle="${vehicleId}" 
-      and vehicle.id_user="${userId}" and note.id_note=${noteId} limit 1;`
+      vehicle.id_vehicle=note.id_vehicle where vehicle.id_vehicle=${vehicleId} 
+      and vehicle.id_user=${userId} and note.id_note=${noteId} limit 1;`
     ).then((data: any) => (notes = data));
 
     if (notes.length === 0) {
@@ -163,7 +163,7 @@ export class Note {
 
     try {
       await MySql.executeQuery(
-        `Update note set note="${note.note}" where id_note=${noteId};`
+        `Update note set note='${note.note}' where id_note=${noteId};`
       )
         .then((data: any) => {
           result.ok = true;

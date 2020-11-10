@@ -44,7 +44,7 @@ export class Vehicle {
     let veicles: ModelVehicle[] = [];
 
     await MySql.executeQuery(
-      `SELECT * FROM vehicle where id_vehicle="${vehicleId}" limit 1;`
+      `SELECT * FROM vehicle where id_vehicle=${vehicleId} limit 1;`
     ).then((data: any) => (veicles = data));
 
     if (veicles.length === 0) {
@@ -56,7 +56,7 @@ export class Vehicle {
       await MySql.executeQuery(
         `SELECT v.*, s.state, bs.style, t.type 
             FROM vehicle v INNER JOIN state s on v.id_state=s.id_state INNER JOIN body_style bs on v.id_body_style=bs.id_body_style
-            INNER JOIN type t on v.id_type=t.id_type where v.id_vehicle="${vehicleId}" limit 1`
+            INNER JOIN type t on v.id_type=t.id_type where v.id_vehicle=${vehicleId} limit 1;`
       )
         .then((data: any) => {
           result.ok = true;
@@ -86,7 +86,7 @@ export class Vehicle {
     await userLogin(req).then((res) => (userId = res));
 
     await MySql.executeQuery(
-      `SELECT * FROM vehicle where vin="${req.body.vin}" limit 1;`
+      `SELECT * FROM vehicle where vin='${req.body.vin}' limit 1;`
     ).then((data: any) => (vehicles = data));
 
     if (vehicles.length > 0) {
@@ -122,7 +122,7 @@ export class Vehicle {
     let states: ModelState[] = [];
 
     await MySql.executeQuery(
-      `SELECT * FROM state where id_state="${vehicle.id_state}" limit 1;`
+      `SELECT * FROM state where id_state=${vehicle.id_state} limit 1;`
     ).then((data: any) => (states = data));
 
     if (states.length === 0) {
@@ -133,7 +133,7 @@ export class Vehicle {
     let types: ModelType[] = [];
 
     await MySql.executeQuery(
-      `SELECT * FROM type where id_type="${vehicle.id_type}" limit 1;`
+      `SELECT * FROM type where id_type=${vehicle.id_type} limit 1;`
     ).then((data: any) => (types = data));
 
     if (types.length === 0) {
@@ -144,7 +144,7 @@ export class Vehicle {
     let bodyStyles: ModelBodyStyle[] = [];
 
     await MySql.executeQuery(
-      `SELECT * FROM body_style where id_body_style="${vehicle.id_body_style}" limit 1;`
+      `SELECT * FROM body_style where id_body_style=${vehicle.id_body_style} limit 1;`
     ).then((data: any) => (bodyStyles = data));
 
     if (bodyStyles.length === 0) {
@@ -155,14 +155,14 @@ export class Vehicle {
     try {
       await MySql.executeQuery(
         `INSERT INTO vehicle(model, mileage,colour,transmission,cylinders,fuel,revolutions,motor,vin,\`keys\`,description,id_type,id_state,id_body_style,id_user) 
-            VALUES("${vehicle.model}","${vehicle.mileage}","${
+            VALUES('${vehicle.model}','${vehicle.mileage}','${
           vehicle.colour
-        }","${vehicle.transmission}", "${vehicle.cylinders}","${
+        }','${vehicle.transmission}', '${vehicle.cylinders}','${
           vehicle.fuel
-        }", ${vehicle.revolutions},
-                   ${vehicle.motor},"${vehicle.vin.toUpperCase()}", ${
+        }', ${vehicle.revolutions},
+                   ${vehicle.motor},'${vehicle.vin.toUpperCase()}', ${
           vehicle.keys
-        }, "${vehicle.description}",${vehicle.id_type}, ${vehicle.id_state}, ${
+        }, '${vehicle.description}',${vehicle.id_type}, ${vehicle.id_state}, ${
           vehicle.id_body_style
         },${vehicle.id_user});`
       )
@@ -196,7 +196,7 @@ export class Vehicle {
     await userLogin(req).then((res) => (userId = res));
 
     await MySql.executeQuery(
-      `SELECT * FROM vehicle where id_vehicle=${vehicleId} and  id_user="${userId}" limit 1;`
+      `SELECT * FROM vehicle where id_vehicle=${vehicleId} and  id_user=${userId} limit 1;`
     ).then((data: any) => (vehicles = data));
 
     if (vehicles.length === 0) {
@@ -252,7 +252,7 @@ export class Vehicle {
       let states: ModelState[] = [];
 
       await MySql.executeQuery(
-        `SELECT * FROM state where id_state="${vehicle.id_state}" limit 1;`
+        `SELECT * FROM state where id_state=${vehicle.id_state} limit 1;`
       ).then((data: any) => (states = data));
 
       if (states.length === 0) {
@@ -265,7 +265,7 @@ export class Vehicle {
       let types: ModelType[] = [];
 
       await MySql.executeQuery(
-        `SELECT * FROM type where id_type="${vehicle.id_type}" limit 1;`
+        `SELECT * FROM type where id_type=${vehicle.id_type} limit 1;`
       ).then((data: any) => (types = data));
 
       if (types.length === 0) {
@@ -278,7 +278,7 @@ export class Vehicle {
       let bodyStyles: ModelBodyStyle[] = [];
 
       await MySql.executeQuery(
-        `SELECT * FROM body_style where id_body_style="${vehicle.id_body_style}" limit 1;`
+        `SELECT * FROM body_style where id_body_style=${vehicle.id_body_style} limit 1;`
       ).then((data: any) => (bodyStyles = data));
 
       if (bodyStyles.length === 0) {
@@ -289,9 +289,9 @@ export class Vehicle {
 
     try {
       await MySql.executeQuery(
-        `UPDATE vehicle SET model="${vehicle.model}", mileage="${vehicle.mileage}",colour="${vehicle.colour}",transmission="${vehicle.transmission}",
-        cylinders="${vehicle.cylinders}",fuel="${vehicle.fuel}",revolutions=${vehicle.revolutions},motor=${vehicle.motor},\`keys\`=${vehicle.keys},
-        description="${vehicle.description}",id_type=${vehicle.id_type},id_state=${vehicle.id_state},id_body_style=${vehicle.id_body_style} WHERE id_vehicle=${vehicleId};`
+        `UPDATE vehicle SET model='${vehicle.model}', mileage='${vehicle.mileage}',colour='${vehicle.colour}',transmission='${vehicle.transmission}',
+        cylinders='${vehicle.cylinders}',fuel='${vehicle.fuel}',revolutions=${vehicle.revolutions},motor=${vehicle.motor},\`keys\`=${vehicle.keys},
+        description='${vehicle.description}',id_type=${vehicle.id_type},id_state=${vehicle.id_state},id_body_style=${vehicle.id_body_style} WHERE id_vehicle=${vehicleId};`
       )
         .then((data: any) => {
           result.ok = true;

@@ -36,7 +36,7 @@ export class Company {
     let companies: ModelCompany[] = [];
 
     await MySql.executeQuery(
-      `SELECT * FROM company where id_company="${companyId}" limit 1;`
+      `SELECT * FROM company where id_company=${companyId} limit 1;`
     ).then((data: any) => (companies = data));
 
     if (companies.length === 0) {
@@ -46,7 +46,7 @@ export class Company {
 
     try {
       await MySql.executeQuery(
-        `SELECT * FROM company where id_company="${companyId}" limit 1`
+        `SELECT * FROM company where id_company=${companyId} limit 1`
       )
         .then((data: any) => {
           result.ok = true;
@@ -73,7 +73,7 @@ export class Company {
     let companies: ModelCompany[] = [];
 
     await MySql.executeQuery(
-      `SELECT * FROM company where name="${req.body.name}" or email="${req.body.email}" limit 1;`
+      `SELECT * FROM company where name='${req.body.name}' or email='${req.body.email}' limit 1;`
     ).then((data: any) => (companies = data));
 
     if (companies.length > 0) {
@@ -102,8 +102,8 @@ export class Company {
     try {
       await MySql.executeQuery(
         `INSERT INTO company(name,email,phone,addres,mission,vision,\`values\`,maximum_profit,minimum_profit) 
-            VALUES("${company.name}", "${company.email}", "${company.phone}", "${company.addres}", "${company.mission}", "${company.vision}",
-            "${company.values}", ${company.maximum_profit}, ${company.minimum_profit})`
+            VALUES('${company.name}', '${company.email}', '${company.phone}', '${company.addres}', '${company.mission}', '${company.vision}',
+            '${company.values}', ${company.maximum_profit}, ${company.minimum_profit})`
       )
         .then((data: any) => {
           result.ok = true;
@@ -132,7 +132,7 @@ export class Company {
     let companies: ModelCompany[] = [];
 
     await MySql.executeQuery(
-      `SELECT * FROM company where id_company="${companyId}" limit 1;`
+      `SELECT * FROM company where id_company=${companyId} limit 1;`
     ).then((data: any) => (companies = data));
 
     if (companies.length === 0) {
@@ -170,8 +170,8 @@ export class Company {
 
     try {
       await MySql.executeQuery(
-        `Update company set name="${company.name}",email="${company.email}",phone="${company.phone}",addres="${company.addres}",mission="${company.mission}",
-            vision="${company.vision}",\`values\`="${company.values}",maximum_profit=${company.maximum_profit},minimum_profit=${company.minimum_profit} where id_company=${companyId};`
+        `Update company set name='${company.name}',email='${company.email}',phone='${company.phone}',addres='${company.addres}',mission='${company.mission}',
+            vision='${company.vision}',\`values\`='${company.values}',maximum_profit=${company.maximum_profit},minimum_profit=${company.minimum_profit} where id_company=${companyId};`
       )
         .then((data: any) => {
           result.ok = true;

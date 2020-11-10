@@ -42,7 +42,7 @@ export class Auction {
     let auctions: ModelAuction[] = [];
 
     await MySql.executeQuery(
-      `SELECT * FROM auction where id_auction="${auctionId}" limit 1;`
+      `SELECT * FROM auction where id_auction=${auctionId} limit 1;`
     ).then((data: any) => (auctions = data));
 
     if (auctions.length === 0) {
@@ -52,7 +52,7 @@ export class Auction {
 
     try {
       await MySql.executeQuery(
-        `SELECT * FROM auction where id_auction="${auctionId}" limit 1;`
+        `SELECT * FROM auction where id_auction=${auctionId} limit 1;`
       )
         .then((data: any) => {
           result.ok = true;
@@ -135,8 +135,8 @@ export class Auction {
 
     try {
       await MySql.executeQuery(
-        `INSERT INTO auction(auction_date, initial_amount, description, active, id_vehicle) VALUES("${auction.auction_date}", 
-        ${auction.initial_amount}, "${auction.description}", "${auction.active}", ${vehicleId});`
+        `INSERT INTO auction(auction_date, initial_amount, description, active, id_vehicle) VALUES('${auction.auction_date}', 
+        ${auction.initial_amount}, '${auction.description}', '${auction.active}', ${vehicleId});`
       )
         .then((data: any) => {
           result.ok = true;
@@ -183,7 +183,7 @@ export class Auction {
     }
 
     await MySql.executeQuery(
-      `SELECT * FROM auction where id_auction="${auctionId}" limit 1;`
+      `SELECT * FROM auction where id_auction=${auctionId} limit 1;`
     ).then((data: any) => (auctions = data));
 
     if (auctions.length === 0) {
@@ -223,7 +223,7 @@ export class Auction {
     let auctions: ModelAuction[] = [];
 
     await MySql.executeQuery(
-      `SELECT * FROM auction where id_auction="${auctionId}" limit 1;`
+      `SELECT * FROM auction where id_auction=${auctionId} limit 1;`
     ).then((data: any) => (auctions = data));
 
     if (auctions.length === 0) {
@@ -263,7 +263,7 @@ export class Auction {
     let auctioneds: ModelAuctioned[] = [];
 
     await MySql.executeQuery(
-      `SELECT * FROM auction where id_auction="${auctionId}" limit 1;`
+      `SELECT * FROM auction where id_auction=${auctionId} limit 1;`
     ).then((data: any) => (auctions = data));
 
     if (auctions.length === 0) {
@@ -272,7 +272,7 @@ export class Auction {
     }
 
     await MySql.executeQuery(
-      `SELECT * FROM auctioned where id_auctioned="${auctionedId}" and cancelled is null limit 1;`
+      `SELECT * FROM auctioned where id_auctioned=${auctionedId} and cancelled is null limit 1;`
     ).then((data: any) => (auctioneds = data));
 
     if (auctioneds.length === 0) {
@@ -318,7 +318,7 @@ export class Auction {
     await userLogin(req).then((res) => (userId = res));
 
     await MySql.executeQuery(
-      `SELECT * FROM auction where id_auction="${auctionId}" limit 1;`
+      `SELECT * FROM auction where id_auction=${auctionId} limit 1;`
     ).then((data: any) => (auctions = data));
 
     if (auctions.length === 0) {
@@ -327,7 +327,7 @@ export class Auction {
     }
 
     await MySql.executeQuery(
-      `SELECT v.* FROM auction au inner join vehicle v on au.id_vehicle=v.id_vehicle where au.id_auction="${auctionId}" and v.id_user=${userId} limit 1;`
+      `SELECT v.* FROM auction au inner join vehicle v on au.id_vehicle=v.id_vehicle where au.id_auction=${auctionId} and v.id_user=${userId} limit 1;`
     ).then((data: any) => (vehicles = data));
 
     if (vehicles.length > 0) {
@@ -336,7 +336,7 @@ export class Auction {
     }
 
     await MySql.executeQuery(
-      `select max(amount) as amount from auctioned where id_auction="${auctionId}" and cancelled is null limit 1;`
+      `select max(amount) as amount from auctioned where id_auction=${auctionId} and cancelled is null limit 1;`
     ).then((data: any) => (auctioneds = data));
 
     !!req.body.amount && (auctioned.amount = req.body.amount);
@@ -390,7 +390,7 @@ export class Auction {
     try {
       await MySql.executeQuery(
         `INSERT INTO auctioned(amount,description,id_auction,id_user) 
-        VALUES(${auctioned.amount}, "${auctioned.description}", ${auctionId}, ${userId});`
+        VALUES(${auctioned.amount}, '${auctioned.description}', ${auctionId}, ${userId});`
       )
         .then((data: any) => {
           result.ok = true;

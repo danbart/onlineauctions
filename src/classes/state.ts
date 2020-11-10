@@ -36,7 +36,7 @@ export class State {
     let states: ModelState[] = [];
 
     await MySql.executeQuery(
-      `SELECT * FROM state where id_state="${stateId}" limit 1;`
+      `SELECT * FROM state where id_state=${stateId} limit 1;`
     ).then((data: any) => (states = data));
 
     if (states.length === 0) {
@@ -46,7 +46,7 @@ export class State {
 
     try {
       await MySql.executeQuery(
-        `SELECT * FROM state where id_state="${stateId}" limit 1`
+        `SELECT * FROM state where id_state=${stateId} limit 1`
       )
         .then((data: any) => {
           result.ok = true;
@@ -73,7 +73,7 @@ export class State {
     let states: ModelState[] = [];
 
     await MySql.executeQuery(
-      `SELECT * FROM state where state="${req.body.state}" limit 1;`
+      `SELECT * FROM state where state='${req.body.state}' limit 1;`
     ).then((data: any) => (states = data));
 
     if (states.length > 0) {
@@ -85,7 +85,7 @@ export class State {
 
     try {
       await MySql.executeQuery(
-        `INSERT INTO state(state) VALUES("${state.state}")`
+        `INSERT INTO state(state) VALUES('${state.state}')`
       )
         .then((data: any) => {
           result.ok = true;
@@ -114,7 +114,7 @@ export class State {
     let states: ModelState[] = [];
 
     await MySql.executeQuery(
-      `SELECT * FROM state where id_state="${stateId}" limit 1;`
+      `SELECT * FROM state where id_state=${stateId} limit 1;`
     ).then((data: any) => (states = data));
 
     if (states.length === 0) {
@@ -126,7 +126,7 @@ export class State {
 
     try {
       await MySql.executeQuery(
-        `Update state set state="${state.state}" where id_state=${stateId};`
+        `Update state set state='${state.state}' where id_state=${stateId};`
       )
         .then((data: any) => {
           result.ok = true;

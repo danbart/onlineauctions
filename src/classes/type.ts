@@ -36,7 +36,7 @@ export class Type {
     let types: ModelType[] = [];
 
     await MySql.executeQuery(
-      `SELECT * FROM type where id_type="${typeId}" limit 1;`
+      `SELECT * FROM type where id_type=${typeId} limit 1;`
     ).then((data: any) => (types = data));
 
     if (types.length === 0) {
@@ -46,7 +46,7 @@ export class Type {
 
     try {
       await MySql.executeQuery(
-        `SELECT * FROM type where id_type="${typeId}" limit 1`
+        `SELECT * FROM type where id_type=${typeId} limit 1`
       )
         .then((data: any) => {
           result.ok = true;
@@ -73,7 +73,7 @@ export class Type {
     let types: ModelType[] = [];
 
     await MySql.executeQuery(
-      `SELECT * FROM type where type="${req.body.type}" limit 1;`
+      `SELECT * FROM type where type='${req.body.type}' limit 1;`
     ).then((data: any) => (types = data));
 
     if (types.length > 0) {
@@ -84,7 +84,7 @@ export class Type {
     !!req.body.type && (type.type = req.body.type);
 
     try {
-      await MySql.executeQuery(`INSERT INTO type(type) VALUES("${type.type}")`)
+      await MySql.executeQuery(`INSERT INTO type(type) VALUES('${type.type}')`)
         .then((data: any) => {
           result.ok = true;
           result.data = [{ typeId: data.insertId }];
@@ -112,7 +112,7 @@ export class Type {
     let types: ModelType[] = [];
 
     await MySql.executeQuery(
-      `SELECT * FROM type where id_type="${typeId}" limit 1;`
+      `SELECT * FROM type where id_type=${typeId} limit 1;`
     ).then((data: any) => (types = data));
 
     if (types.length === 0) {
@@ -124,7 +124,7 @@ export class Type {
 
     try {
       await MySql.executeQuery(
-        `Update type set type="${type.type}" where id_stype=${typeId};`
+        `Update type set type='${type.type}' where id_stype=${typeId};`
       )
         .then((data: any) => {
           result.ok = true;
