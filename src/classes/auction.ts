@@ -8,6 +8,7 @@ import { ModelVehicle } from "../models/vehicle";
 import MySql from "../mysql/mysql";
 import { userLogin } from "../utils/jwt";
 import { IResponse } from "./interface/IResponse";
+import { ModelAccount } from '../models/account';
 
 export class Auction {
   getAuction = async (req: Request, res: Response) => {
@@ -84,6 +85,8 @@ export class Auction {
 
     let photos: ModelPhoto[] = [];
 
+    let accouts: ModelAccount[] = [];
+
     let userId = 0;
     await userLogin(req).then((res) => (userId = res));
 
@@ -95,6 +98,15 @@ export class Auction {
       result.error = {
         message: "El Vehiculo no existe",
       };
+      return res.status(401).json(result);
+    }
+
+    await MySql.executeQuery(
+      `SELECT * FROM account where id_user=${userId} and active is not null limit 1;`
+    ).then((data: any) => (accouts = data));
+
+    if (accouts.length === 0) {
+      result.error = { message: "usuario no tiene cuenta solicite una" };
       return res.status(401).json(result);
     }
 
@@ -351,10 +363,7 @@ export class Auction {
       return res.status(401).json(result);
     }
 
-    if (
-      auctioneds.length > 0 &&
-      parseInt(auctioneds[0].amount) >= parseInt(auctioned.amount)
-    ) {
+    if (auctioneds.length > 0 && auctioneds[0].amount >= auctioned.amount) {
       result.error = {
         message:
           "El monto a subastar tiene que ser mayor ultimo monto ofertado " +
@@ -365,7 +374,7 @@ export class Auction {
 
     if (
       !!auctions[0].increased_amount &&
-      auctions[0].increased_amount > parseInt(auctioned.amount)
+      auctions[0].increased_amount > auctioned.amount
     ) {
       result.error = {
         message:
@@ -375,7 +384,7 @@ export class Auction {
       return res.status(401).json(result);
     }
 
-    if (auctions[0].initial_amount > parseInt(auctioned.amount)) {
+    if (auctions[0].initial_amount > auctioned.amount) {
       result.error = {
         message:
           "El monto a subastar tiene que ser mayor al indicado por el cliente " +
