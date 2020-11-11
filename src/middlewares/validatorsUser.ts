@@ -36,3 +36,18 @@ export const userValidatorLogin = {
     password: Joi.string().required(),
   }),
 };
+
+export const userUpdatePasswordValidator = {
+  body: Joi.object({
+    old_password: Joi.string().required(),
+    new_password: Joi.string()
+      .regex(/[a-zA-Z0-9]{6,30}/)
+      .required(),
+  }),
+};
+
+export const userRolValidator = {
+  body: Joi.object({
+    role: Joi.string().required(),
+  }),
+};

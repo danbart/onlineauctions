@@ -7,6 +7,8 @@ import {
   verificaToken,
 } from "../middlewares/autentication";
 import {
+  userRolValidator,
+  userUpdatePasswordValidator,
   userValidator,
   userValidatorUpdate,
 } from "../middlewares/validatorsUser";
@@ -30,9 +32,24 @@ routerUser.put(
   user.putUser
 );
 routerUser.put(
+  "/profile/password",
+  [verificaToken, validate(userUpdatePasswordValidator)],
+  user.updatePasswordUser
+);
+routerUser.put(
   "/:id",
   [verificaToken, isAdmin, validate(userValidatorUpdate)],
   user.putUser
+);
+routerUser.post(
+  "/:id/createrole",
+  [verificaToken, isAdmin, validate(userRolValidator)],
+  user.postUserRoleCreate
+);
+routerUser.delete(
+  "/:id/deleterole",
+  [verificaToken, isAdmin, validate(userRolValidator)],
+  user.deleteUserRole
 );
 routerUser.post("/profile/avatar", verificaToken, user.postAvatar);
 

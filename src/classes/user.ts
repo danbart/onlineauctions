@@ -10,6 +10,7 @@ import {
 } from "../global/environment";
 import { ModelAuctioned } from "../models/auctioned";
 import { ModelRole } from "../models/role";
+import { ModelRoleUser } from "../models/roleUser";
 import { ModelUser } from "../models/user";
 import { ModelVehicle } from "../models/vehicle";
 import MySql from "../mysql/mysql";
@@ -265,6 +266,283 @@ export class User {
       result.error = { message: "Usuario y Contraseña erróneo" };
     }
     return res.json(result);
+  };
+
+  updatePasswordUser = async (req: Request, res: Response) => {
+    const user = new ModelUser();
+
+    const result: IResponse = {
+      ok: false,
+    };
+
+    let userId = 0;
+    await userLogin(req).then((res) => (userId = res));
+
+    let users: ModelUser[] = [];
+
+    await MySql.executeQuery(
+      `SELECT id_user, password FROM user where id_user='${userId}' limit 1;`
+    ).then((data: any) => (users = data));
+
+    if (users.length === 0) {
+      result.error = { message: "Usuario no existe" };
+      return res.status(401).json(result);
+    }
+
+    if (
+      !!req.body.old_password &&
+      (await bcrypt.compare(
+        req.body.old_password,
+        Object.values(users)[0].password
+      ))
+    ) {
+      !!req.body.new_password &&
+        (user.password = await bcrypt.hash(req.body.new_password, 10));
+
+      try {
+        await MySql.executeQuery(
+          `UPDATE user SET password='${user.password}' where id_user=${userId};`
+        )
+          .then((data: any) => {
+            result.ok = true;
+            result.data = [{ message: data.message }];
+          })
+          .catch((err) => {
+            result.ok = false;
+            result.error = err.sqlMessage;
+          });
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      result.error = { message: "Su antigua Contraseña es errónea" };
+    }
+    return res.json(result);
+  };
+
+  postUserRoleCreate = async (req: Request, res: Response) => {
+    const result: IResponse = {
+      ok: false,
+    };
+
+    let userId = req.params.id;
+
+    const rol = new ModelRole();
+    let roles: ModelRole[] = [];
+    let rolesUser: ModelRole[] = [];
+    let rolUser: ModelRoleUser[] = [];
+
+    let users: ModelUser[] = [];
+
+    await MySql.executeQuery(
+      `SELECT * FROM user where id_user=${userId} limit 1;`
+    ).then((data: any) => (users = data));
+
+    if (users.length === 0) {
+      result.error = { message: "Usuario no existe" };
+      return res.status(401).json(result);
+    }
+
+    await MySql.executeQuery(`SELECT * FROM role;`).then(
+      (data: any) => (roles = data)
+    );
+
+    if (roles.length === 0) {
+      result.error = { message: "Error en roles de ususario" };
+      return res.status(401).json(result);
+    }
+
+    await MySql.executeQuery(
+      `SELECT * FROM role_user where id_user=${userId};`
+    ).then((data: any) => (rolUser = data));
+
+    if (rolUser.length === 0) {
+      result.error = { message: "Error en roles de ususario" };
+      roles.forEach(async (val: ModelRole) => {
+        if (val.role === "users") {
+          await MySql.executeQuery(
+            `INSERT INTO role_user(id_user,id_role) VALUES(${userId}, ${val.id_role});`
+          );
+        }
+      });
+      return res.status(401).json(result);
+    }
+
+    !!req.body.role && (rol.role = req.body.role);
+
+    try {
+      for (let val of roles) {
+        if (val.role === rol.role) {
+          await MySql.executeQuery(
+            `SELECT r.* FROM role r inner join role_user ru on r.id_role=ru.id_role where ru.id_user=${userId} and r.role='${rol.role}';`
+          ).then((data: any) => (rolesUser = data));
+
+          if (rolesUser.length > 0) {
+            result.error = {
+              message: "Error ya cuenta con ese role de ususario",
+            };
+            return res.status(401).json(result);
+          }
+
+          if (rol.role === "admin") {
+            await MySql.executeQuery(
+              `SELECT * FROM role where role='register';`
+            ).then((data: any) => (rolesUser = data));
+
+            if (rolesUser.length > 0) {
+              await MySql.executeQuery(
+                `INSERT INTO role_user(id_user,id_role) VALUES(${userId}, ${rolesUser[0].id_role});`
+              );
+            }
+          }
+          await MySql.executeQuery(
+            `SELECT * FROM role where role='${rol.role}';`
+          ).then((data: any) => (rolesUser = data));
+
+          if (rolesUser.length > 0) {
+            await MySql.executeQuery(
+              `INSERT INTO role_user(id_user,id_role) VALUES(${userId}, ${rolesUser[0].id_role});`
+            )
+              .then((data: any) => {
+                result.ok = true;
+                result.data = [{ message: "Rol cargado correctamente" }];
+              })
+              .catch((err) => {
+                result.ok = false;
+                result.error = err.sqlMessage;
+              });
+            return res.json(result);
+          }
+          return res.status(401).json(result);
+        }
+      }
+      result.error = { message: "Rol no Existe" };
+      return res.json(result);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  deleteUserRole = async (req: Request, res: Response) => {
+    const result: IResponse = {
+      ok: false,
+    };
+
+    let userId = req.params.id;
+
+    const rol = new ModelRole();
+    let roles: ModelRole[] = [];
+    let rolesUser: ModelRole[] = [];
+    let rolUser: ModelRoleUser[] = [];
+
+    let users: ModelUser[] = [];
+
+    await MySql.executeQuery(
+      `SELECT * FROM user where id_user=${userId} limit 1;`
+    ).then((data: any) => (users = data));
+
+    if (users.length === 0) {
+      result.error = { message: "Usuario no existe" };
+      return res.status(401).json(result);
+    }
+
+    await MySql.executeQuery(`SELECT * FROM role;`).then(
+      (data: any) => (roles = data)
+    );
+
+    if (roles.length === 0) {
+      result.error = { message: "Error en roles de ususario" };
+      return res.status(401).json(result);
+    }
+
+    await MySql.executeQuery(
+      `SELECT * FROM role_user where id_user=${userId};`
+    ).then((data: any) => (rolUser = data));
+
+    if (rolUser.length === 0) {
+      result.error = { message: "Error en roles de ususario" };
+      roles.forEach(async (val: ModelRole) => {
+        if (val.role === "users") {
+          await MySql.executeQuery(
+            `INSERT INTO role_user(id_user,id_role) VALUES(${userId}, ${val.id_role});`
+          );
+        }
+      });
+      return res.status(401).json(result);
+    }
+
+    !!req.body.role && (rol.role = req.body.role);
+
+    try {
+      for (let val of roles) {
+        if (val.role === rol.role) {
+          await MySql.executeQuery(
+            `SELECT r.* FROM role r inner join role_user ru on r.id_role=ru.id_role where ru.id_user=${userId} and r.role='${rol.role}';`
+          ).then((data: any) => (rolesUser = data));
+
+          if (rolesUser.length === 0) {
+            result.error = {
+              message: "Error no cuenta con ese role de ususario",
+            };
+            return res.status(401).json(result);
+          }
+
+          if (rol.role === "users") {
+            result.error = {
+              message: "Error no puede eliminar el role de ususario",
+            };
+            return res.status(401).json(result);
+          }
+
+          if (rol.role === "register") {
+            await MySql.executeQuery(
+              `SELECT * FROM role where role='admin';`
+            ).then((data: any) => (rolesUser = data));
+
+            if (rolesUser.length > 0) {
+              await MySql.executeQuery(
+                `DELETE FROM role_user WHERE (id_user = ${userId}) and (id_role =  ${rolesUser[0].id_role});`
+              );
+            }
+          }
+
+          if (rol.role === "admin") {
+            await MySql.executeQuery(
+              `SELECT * FROM role where role='register';`
+            ).then((data: any) => (rolesUser = data));
+
+            if (rolesUser.length > 0) {
+              await MySql.executeQuery(
+                `DELETE FROM role_user WHERE (id_user = ${userId}) and (id_role =  ${rolesUser[0].id_role});`
+              );
+            }
+          }
+          await MySql.executeQuery(
+            `SELECT * FROM role where role='${rol.role}';`
+          ).then((data: any) => (rolesUser = data));
+
+          if (rolesUser.length > 0) {
+            await MySql.executeQuery(
+              `DELETE FROM role_user WHERE (id_user = ${userId}) and (id_role =  ${rolesUser[0].id_role});`
+            )
+              .then((data: any) => {
+                result.ok = true;
+                result.data = [{ message: "Rol eliminado correctamente" }];
+              })
+              .catch((err) => {
+                result.ok = false;
+                result.error = err.sqlMessage;
+              });
+            return res.json(result);
+          }
+          return res.status(401).json(result);
+        }
+      }
+      result.error = { message: "Rol no Existe" };
+      return res.json(result);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   postAvatar = async (req: Request, res: Response) => {
