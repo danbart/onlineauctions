@@ -438,7 +438,7 @@ export class Account {
     !!req.body.amount && (debt.amount = req.body.amount);
     !!req.body.reason && (debt.reason = req.body.reason);
 
-    if (credit - debt.amount < 0) {
+    if (credit <= 0) {
       result.error = {
         message: "Cuenta sin fondos",
       };
