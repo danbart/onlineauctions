@@ -61,7 +61,7 @@ export const isAdmin = async (
     );
 
     await MySql.executeQuery(
-      `SELECT * FROM role INNER JOIN role_user on role.id_role=role_user.id_role where role.role="admin" && role_user.id_user=${payload.id};`
+      `SELECT * FROM role INNER JOIN role_user on role.id_role=role_user.id_role where role.role='admin' && role_user.id_user=${payload.id};`
     ).then((data: any) => (rol = data));
 
     if (rol.length === 0) {
@@ -96,7 +96,7 @@ export const isRegister = async (
     );
 
     await MySql.executeQuery(
-      `SELECT * FROM role INNER JOIN role_user on role.id_role=role_user.id_role where role.role="register" && role_user.id_user=${payload.id};`
+      `SELECT * FROM role INNER JOIN role_user on role.id_role=role_user.id_role where role.role='register' && role_user.id_user=${payload.id};`
     ).then((data: any) => (rol = data));
 
     if (rol.length === 0) {

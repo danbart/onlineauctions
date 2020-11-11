@@ -1,5 +1,5 @@
 import { MD5 } from "crypto-js";
-import { Request, Response } from "express";
+import { Request } from "express";
 import fs from "fs";
 import moment from "moment";
 import path from "path";
@@ -46,7 +46,7 @@ export const uploadFile = async (id: number, tipo: string, req: Request) => {
 
   if (tipo === "avatar") {
     await MySql.executeQuery(
-      `Update user set avatar="${nombreArchivo}" where id_user=${id}`
+      `Update user set avatar='${nombreArchivo}' where id_user=${id}`
     )
       .then((data: any) => {
         result.ok = true;
@@ -60,7 +60,7 @@ export const uploadFile = async (id: number, tipo: string, req: Request) => {
       });
   } else {
     await MySql.executeQuery(
-      `INSERT INTO photo(photo, id_vehicle) values("${nombreArchivo}", ${id});`
+      `INSERT INTO photo(photo, id_vehicle) values('${nombreArchivo}', ${id});`
     )
       .then((data: any) => {
         result.ok = true;
