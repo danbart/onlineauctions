@@ -88,6 +88,47 @@ export class User {
     }
   };
 
+  getUserRoleId = async (req: Request, res: Response) => {
+    const result: IResponse = {
+      ok: false,
+    };
+
+    let userId = req.params.id;
+
+    if (!userId) {
+      await userLogin(req).then((res) => (userId = res));
+    }
+
+    let users: ModelUser[] = [];
+
+    await MySql.executeQuery(
+      `SELECT * FROM user where id_user=${userId} limit 1;`
+    ).then((data: any) => (users = data));
+
+    if (users.length === 0) {
+      result.error = { message: "Usuario no existe" };
+      return res.status(401).json(result);
+    }
+
+    try {
+      await MySql.executeQuery(
+        `SELECT r.id_role, r.role FROM role_user ru inner join role r on ru.id_role=r.id_role  where ru.id_user=${userId};`
+      )
+        .then((data: any) => {
+          result.ok = true;
+          result.data = data;
+        })
+        .catch((err) => {
+          result.ok = false;
+          result.error = err.sqlMessage;
+        });
+
+      res.json(result);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   postUser = async (req: Request, res: Response) => {
     const result: IResponse = {
       ok: false,
