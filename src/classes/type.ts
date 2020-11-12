@@ -124,7 +124,7 @@ export class Type {
 
     try {
       await MySql.executeQuery(
-        `Update type set type='${type.type}' where id_stype=${typeId};`
+        `Update type set type='${type.type}' where id_type=${typeId};`
       )
         .then((data: any) => {
           result.ok = true;
