@@ -88,6 +88,68 @@ export class User {
     }
   };
 
+  getUserIdPublic = async (req: Request, res: Response) => {
+    const result: IResponse = {
+      ok: false,
+    };
+
+    let userId = req.params.id;
+
+    let users: ModelUser[] = [];
+
+    await MySql.executeQuery(
+      `SELECT * FROM user where id_user=${userId} limit 1;`
+    ).then((data: any) => (users = data));
+
+    if (users.length === 0) {
+      result.error = { message: "Usuario no existe" };
+      return res.status(401).json(result);
+    }
+
+    try {
+      await MySql.executeQuery(
+        `SELECT id_user, name,last_name,avatar,web_site,facebook,twitter FROM user where id_user=${userId};`
+      )
+        .then((data: any) => {
+          result.ok = true;
+          result.data = data;
+        })
+        .catch((err) => {
+          result.ok = false;
+          result.error = err.sqlMessage;
+        });
+
+      res.json(result);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  getUserPublic = async (req: Request, res: Response) => {
+    const result: IResponse = {
+      ok: false,
+    };
+
+    try {
+      await MySql.executeQuery(
+        `SELECT u.id_user, u.name,u.last_name,u.avatar,u.web_site,u.facebook,u.twitter 
+        FROM user u inner join role_user ru on u.id_user=ru.id_user inner join role r on ru.id_role=r.id_role where r.role='users';`
+      )
+        .then((data: any) => {
+          result.ok = true;
+          result.data = data;
+        })
+        .catch((err) => {
+          result.ok = false;
+          result.error = err.sqlMessage;
+        });
+
+      res.json(result);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   getUserRoleId = async (req: Request, res: Response) => {
     const result: IResponse = {
       ok: false,
