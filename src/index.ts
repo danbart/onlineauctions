@@ -8,6 +8,7 @@ import { createAdmin, createRoles } from "./lib/initialSetup";
 import MySql from "./mysql/mysql";
 import router from "./routes/router";
 import Server from "./server/server";
+import expres from "express";
 
 const server = Server.instance;
 
@@ -15,6 +16,9 @@ const server = Server.instance;
 MySql.instances;
 createRoles();
 createAdmin();
+
+// bodyLimit
+server.app.use(expres.json({ limit: "10kb" }));
 
 // BodyPArser
 server.app.use(bodyParser.urlencoded({ extended: true }));
