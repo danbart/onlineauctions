@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import moment from "moment";
 import { FORMAT_DATE_TIME } from "../global/environment";
+import { ModelAccount } from "../models/account";
 import { ModelAuction } from "../models/auction";
 import { ModelAuctioned } from "../models/auctioned";
 import { ModelPhoto } from "../models/photo";
@@ -8,7 +9,6 @@ import { ModelVehicle } from "../models/vehicle";
 import MySql from "../mysql/mysql";
 import { userLogin } from "../utils/jwt";
 import { IResponse } from "./interface/IResponse";
-import { ModelAccount } from '../models/account';
 
 export class Auction {
   getAuction = async (req: Request, res: Response) => {
@@ -111,10 +111,10 @@ export class Auction {
     }
 
     await MySql.executeQuery(
-      `SELECT * FROM photo where id_vehicle=${vehicleId} limit 1;`
+      `SELECT * FROM photo where id_vehicle=${vehicleId};`
     ).then((data: any) => (photos = data));
 
-    if (photos.length >= 3) {
+    if (photos.length < 3) {
       result.error = { message: "El vehiculo necesita minimo 3 fotos" };
       return res.status(401).json(result);
     }

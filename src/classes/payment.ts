@@ -1,15 +1,17 @@
 import { Request, Response } from "express";
-import { ModelState } from "../models/state";
-import MySql from "../mysql/mysql";
-import { userLogin } from "../utils/jwt";
-import { IResponse } from "./interface/IResponse";
-import { ModelPayment } from "../models/payment";
-import { ModelAuction } from "../models/auction";
-import { ModelUser } from "../models/user";
-import { ModelAuctioned } from "../models/auctioned";
+import moment from "moment";
+import { FORMAT_DATE_TIME } from "../global/environment";
 import { ModelAccount } from "../models/account";
-import { balanceDebt } from "../utils/balance";
+import { ModelAuction } from "../models/auction";
+import { ModelAuctioned } from "../models/auctioned";
 import { ModelCompany } from "../models/company";
+import { ModelPayment } from "../models/payment";
+import { ModelUser } from "../models/user";
+import MySql from "../mysql/mysql";
+import { balanceDebt } from "../utils/balance";
+import { userLogin } from "../utils/jwt";
+import { profitCalc } from "../utils/profitCalc";
+import { IResponse } from "./interface/IResponse";
 
 export class Payment {
   getSellerAuctionID = async (req: Request, res: Response) => {
@@ -128,7 +130,7 @@ export class Payment {
     }
   };
 
-  getStateId = async (req: Request, res: Response) => {
+  getBuyerId = async (req: Request, res: Response) => {
     const result: IResponse = {
       ok: false,
     };
@@ -196,8 +198,6 @@ export class Payment {
 
     let userId = req.params.idUser;
     let auctionId = req.params.idAuction;
-    let buyers: ModelPayment[] = [];
-    let users: ModelUser[] = [];
     let auctions: ModelAuction[] = [];
     let auctioneds: ModelAuctioned[] = [];
     let accountsBuy: ModelAccount[] = [];
@@ -218,7 +218,7 @@ export class Payment {
     }
 
     await MySql.executeQuery(
-      `SELECT * FROM auction where id_auction=${auctionId} limit 1;`
+      `SELECT * FROM auction where id_auction=${auctionId} and finished is null limit 1;`
     ).then((data: any) => (auctions = data));
 
     if (auctions.length === 0) {
@@ -282,14 +282,52 @@ export class Payment {
         result.error = { message: "usuario no tiene cuenta solicite una" };
         return res.status(401).json(result);
       }
-      //TODO: falta terminar compra
+
+      const respuesta = await profitCalc(
+        company[0].id_company,
+        auctioneds[0].amount
+      );
+
+      if (respuesta.length === 0) {
+        result.error = {
+          message: "Error al calcular los impuestos",
+        };
+        return res.status(401).json(result);
+      }
+
       try {
         await MySql.executeQuery(
-          `INSERT INTO payment(amount, paid_type, discount, tax, sold) VALUES('${auctioneds[0].amount}')`
+          `INSERT INTO payment(amount, paid_type, discount, tax, sold, id_user_seller, id_user_buyer,id_auction) 
+            VALUES('${auctioneds[0].amount}', '${accountsBuy[0].id_account}', ${respuesta[0]}, ${respuesta[1]}, ${respuesta[2]}, 
+              ${accountsSeller[0].id_user}, ${accountsBuy[0].id_user}, ${auctionId});`
         )
-          .then((data: any) => {
+          .then(async (data: any) => {
             result.ok = true;
             result.data = [{ stateId: data.insertId }];
+
+            await MySql.executeQuery(`INSERT INTO profitability(profit, amount, id_payment,id_company) 
+              values(${respuesta[3]}, ${respuesta[0]}, ${data.insertId}, ${company[0].id_company});`);
+
+            await MySql.executeQuery(`INSERT INTO debt (id_account, amount, reason) 
+              values(${accountsBuy[0].id_account}, ${auctioneds[0].amount}, 'Compra de vehiculo de la subasta No. ${auctionId} con un monto de ${auctioneds[0].amount}');`);
+
+            await MySql.executeQuery(`INSERT INTO credit (id_account, amount, reason, paid_type) 
+              values(${accountsSeller[0].id_account}, ${respuesta[2]}, 'Venta de vehiculo de la subasta No. ${auctionId} con un monto de ${respuesta[2]}', 
+              'Transferencia de cuenta ${accountsBuy[0].id_account}');`);
+
+            await MySql.executeQuery(
+              `UPDATE auction set sold=${
+                respuesta[2]
+              }, finished='${moment().format(
+                FORMAT_DATE_TIME
+              )}' where id_auction=${auctionId};`
+            );
+
+            await MySql.executeQuery(
+              `UPDATE vehicle set sold='${moment().format(
+                FORMAT_DATE_TIME
+              )}' where id_vehicle=${auctions[0].id_vehicle};`
+            );
           })
           .catch((err) => {
             result.ok = false;
@@ -302,47 +340,6 @@ export class Payment {
       }
       result.error = { message: "Usuario no gano la subasta" };
       return res.status(401).json(result);
-    }
-  };
-
-  putState = async (req: Request, res: Response) => {
-    const result: IResponse = {
-      ok: false,
-    };
-
-    const stateId = req.params.id;
-
-    const state = new ModelState();
-
-    let states: ModelState[] = [];
-
-    await MySql.executeQuery(
-      `SELECT * FROM state where id_state=${stateId} limit 1;`
-    ).then((data: any) => (states = data));
-
-    if (states.length === 0) {
-      result.error = { message: "Estado no existe" };
-      return res.status(401).json(result);
-    }
-
-    !!req.body.state && (state.state = req.body.state);
-
-    try {
-      await MySql.executeQuery(
-        `Update state set state='${state.state}' where id_state=${stateId};`
-      )
-        .then((data: any) => {
-          result.ok = true;
-          result.data = [{ message: data.message }];
-        })
-        .catch((err) => {
-          result.ok = false;
-          result.error = err.sqlMessage;
-        });
-
-      res.json(result);
-    } catch (error) {
-      console.log(error);
     }
   };
 }

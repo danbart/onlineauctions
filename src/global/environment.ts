@@ -48,3 +48,8 @@ export const JWT_PRIVATE_KEY = process.env.JWT_PRIVATE_KEY as string;
 export const FORMAT_DATE_TIME = "YYYY-M-D HH:mm:ss";
 
 export const FORMAT_DATE = "YYYY-M-D";
+
+export const TAX = Number(process.env.TAX) || 12;
+
+export const MINIMUM_PROFIT_DISCOUNT =
+  Number(process.env.MINIMUM_PROFIT_DISCOUNT) || 30000;
