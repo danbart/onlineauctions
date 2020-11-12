@@ -76,7 +76,8 @@ export class Opinion {
 
     try {
       await MySql.executeQuery(
-        `SELECT op.*, u.name as opinado_name, u.last_name as opinado_last_name, us.name as opino_name, us.last_name as opino_last_name 
+        `SELECT op.*, u.name as opinado_name, u.last_name as opinado_last_name, u.avatar as opinado_avatar,
+         us.name as opino_name, us.last_name as opino_last_name, us.avatar as opino_avatar 
         FROM opinion op inner join user u on op.id_user_opined=u.id_user
         inner join user us on op.id_user_say=us.id_user 
         where id_opinion=${opinionId} limit 1;`
