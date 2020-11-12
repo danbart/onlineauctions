@@ -133,7 +133,7 @@ export class User {
     try {
       await MySql.executeQuery(
         `SELECT u.id_user, u.name,u.last_name,u.avatar,u.web_site,u.facebook,u.twitter 
-        FROM user u inner join role_user ru on u.id_user=ru.id_user inner join role r on ru.id_role=r.id_role where r.role='users';`
+        FROM user u inner join role_user ru on u.id_user=ru.id_user inner join role r on ru.id_role=r.id_role where r.role!='register' and r.role!='admin';`
       )
         .then((data: any) => {
           result.ok = true;
