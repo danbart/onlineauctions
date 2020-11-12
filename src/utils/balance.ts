@@ -5,7 +5,7 @@ import MySql from "../mysql/mysql";
 export const balanceDebt = async (
   idAccount: number,
   idUser: number,
-  debt: number
+  debit: number
 ) => {
   let credits: ModelCredit[] = [];
   let debts: ModelDebt[] = [];
@@ -31,11 +31,9 @@ export const balanceDebt = async (
     for (let debt of debts) {
       tDebt += debt.amount;
     }
-  } else tDebt = debt;
+  }
 
-  if (tCredit < tDebt) return 0;
-
-  if (tCredit - tDebt <= 0) return 0;
+  tDebt += debit;
 
   return tCredit - tDebt;
 };

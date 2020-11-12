@@ -196,7 +196,7 @@ export class Vehicle {
     await userLogin(req).then((res) => (userId = res));
 
     await MySql.executeQuery(
-      `SELECT * FROM vehicle where id_vehicle=${vehicleId} and  id_user=${userId} limit 1;`
+      `SELECT * FROM vehicle where id_vehicle=${vehicleId} and  id_user=${userId} and sold is null limit 1;`
     ).then((data: any) => (vehicles = data));
 
     if (vehicles.length === 0) {
@@ -320,7 +320,7 @@ export class Vehicle {
     let vehicles: ModelVehicle[] = [];
 
     await MySql.executeQuery(
-      `SELECT * FROM vehicle where id_vehicle=${idVehicle} and id_user=${userId} limit 1;`
+      `SELECT * FROM vehicle where id_vehicle=${idVehicle} and id_user=${userId} and sold is null limit 1;`
     ).then((data: any) => (vehicles = data));
 
     if (vehicles.length === 0) {

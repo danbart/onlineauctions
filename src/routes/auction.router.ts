@@ -1,7 +1,8 @@
 import { Router } from "express";
 import { validate } from "express-validation";
 import { Auction } from "../classes/auction";
-import { verificaToken } from "../middlewares/autentication";
+import { Payment } from "../classes/payment";
+import { isRegister, verificaToken } from "../middlewares/autentication";
 import {
   auctionedValidator,
   auctionValidator,
@@ -10,6 +11,8 @@ import {
 
 export const routerAuction = Router();
 const auction = new Auction();
+
+const payment = new Payment();
 
 routerAuction.get("/", auction.getAuction);
 
@@ -41,4 +44,11 @@ routerAuction.post(
   verificaToken,
   validate(auctionedValidator),
   auction.postAuctionIdAuctioned
+);
+
+routerAuction.post(
+  "/:idAuction/buyer/:idUser",
+  verificaToken,
+  isRegister,
+  payment.postPayment
 );
