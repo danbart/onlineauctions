@@ -7,6 +7,7 @@ import { ModelAuctioned } from "../models/auctioned";
 import { ModelPhoto } from "../models/photo";
 import { ModelVehicle } from "../models/vehicle";
 import MySql from "../mysql/mysql";
+import { twominutes } from "../utils/converTimeZone";
 import { userLogin } from "../utils/jwt";
 import { IResponse } from "./interface/IResponse";
 
@@ -344,6 +345,26 @@ export class Auction {
 
     if (vehicles.length > 0) {
       result.error = { message: "No puede subastar su propio vehiculo" };
+      return res.status(401).json(result);
+    }
+
+    await MySql.executeQuery(
+      `select * from auctioned where id_user=${userId} and cancelled is null order by created_at desc limit 1;`
+    ).then((data: any) => (auctioneds = data));
+
+    console.log(moment().subtract(1, "day").calendar());
+    const gthora =
+      auctioneds.length > 0 &&
+      twominutes(moment(auctioneds[0].created_at).format(FORMAT_DATE_TIME));
+
+    if (
+      auctioneds.length > 0 &&
+      moment(gthora.toString()).diff(moment(), "minute") >= 0 &&
+      moment(gthora.toString()).diff(moment(), "minute") <= 2
+    ) {
+      result.error = {
+        message: "Tiene que esperar 2 minutos para volver a subastar",
+      };
       return res.status(401).json(result);
     }
 
