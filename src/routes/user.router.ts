@@ -21,7 +21,6 @@ routerUser.get("/profile", verificaToken, user.getUserId);
 routerUser.get("/profile/vehicle", verificaToken, user.getProfileVehicles);
 routerUser.get("/profile/auctioned", verificaToken, user.getProfileAuctioneds);
 routerUser.get("/profile/role", verificaToken, user.getUserRoleId);
-routerUser.get("/public", user.getUserPublic);
 routerUser.get("/public/:id", user.getUserIdPublic);
 routerUser.get("/:id/role", verificaToken, isAdmin, user.getUserRoleId);
 routerUser.get("/:id", [verificaToken, isRegister], user.getUserId);
