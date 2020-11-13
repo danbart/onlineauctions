@@ -9,6 +9,7 @@ import {
   JWT_PRIVATE_KEY,
 } from "../global/environment";
 import { ModelAuctioned } from "../models/auctioned";
+import { ModelOpinion } from "../models/opinion";
 import { ModelRole } from "../models/role";
 import { ModelRoleUser } from "../models/roleUser";
 import { ModelUser } from "../models/user";
@@ -725,6 +726,106 @@ export class User {
         `SELECT v.*, s.state, bs.style, t.type 
         FROM vehicle v INNER JOIN state s on v.id_state=s.id_state INNER JOIN body_style bs on v.id_body_style=bs.id_body_style
         INNER JOIN type t on v.id_type=t.id_type where v.id_user=${userId} order by v.created_at desc;`
+      )
+        .then((data: any) => {
+          result.ok = true;
+          result.data = data;
+        })
+        .catch((err) => {
+          result.ok = false;
+          result.error = err.sqlMessage;
+        });
+
+      res.json(result);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  getUserRatingId = async (req: Request, res: Response) => {
+    const result: IResponse = {
+      ok: false,
+    };
+
+    let userId = req.params.id;
+    if (!userId) {
+      await userLogin(req).then((res) => (userId = res));
+    }
+
+    let users: ModelUser[] = [];
+    let opinios: ModelOpinion[] = [];
+
+    await MySql.executeQuery(
+      `SELECT * FROM user where id_user=${userId} limit 1;`
+    ).then((data: any) => (users = data));
+
+    if (users.length === 0) {
+      result.error = { message: "Usuario no Existe" };
+      return res.status(401).json(result);
+    }
+
+    await MySql.executeQuery(
+      `SELECT * FROM opinion where id_user_opined=${userId};`
+    ).then((data: any) => (opinios = data));
+
+    if (opinios.length === 0) {
+      result.error = { message: "Usuario no tiene opiniones" };
+      return res.status(401).json(result);
+    }
+
+    try {
+      await MySql.executeQuery(
+        `select id_user_opined, avg(rating) as rating from opinion where id_user_opined=${userId} group by id_user_opined;`
+      )
+        .then((data: any) => {
+          result.ok = true;
+          result.data = [data, opinios];
+        })
+        .catch((err) => {
+          result.ok = false;
+          result.error = err.sqlMessage;
+        });
+
+      res.json(result);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  getUserCommentedId = async (req: Request, res: Response) => {
+    const result: IResponse = {
+      ok: false,
+    };
+
+    let userId = req.params.id;
+    if (!userId) {
+      await userLogin(req).then((res) => (userId = res));
+    }
+
+    let users: ModelUser[] = [];
+    let opinios: ModelOpinion[] = [];
+
+    await MySql.executeQuery(
+      `SELECT * FROM user where id_user=${userId} limit 1;`
+    ).then((data: any) => (users = data));
+
+    if (users.length === 0) {
+      result.error = { message: "Usuario no Existe" };
+      return res.status(401).json(result);
+    }
+
+    await MySql.executeQuery(
+      `SELECT * FROM opinion where id_user_say=${userId};`
+    ).then((data: any) => (opinios = data));
+
+    if (opinios.length === 0) {
+      result.error = { message: "Usuario no tiene Comentarios" };
+      return res.status(401).json(result);
+    }
+
+    try {
+      await MySql.executeQuery(
+        `SELECT * FROM opinion where id_user_say=${userId};`
       )
         .then((data: any) => {
           result.ok = true;

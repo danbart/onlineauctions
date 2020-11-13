@@ -14,16 +14,14 @@ import { profitCalc } from "../utils/profitCalc";
 import { IResponse } from "./interface/IResponse";
 
 export class Payment {
-  getSellerAuctionID = async (req: Request, res: Response) => {
+  getSellerUserID = async (req: Request, res: Response) => {
     const result: IResponse = {
       ok: false,
     };
 
-    let userId = req.params.idUser;
-    let auctionId = req.params.idAuction;
+    let userId = req.params.id;
     let sellers: ModelPayment[] = [];
     let users: ModelUser[] = [];
-    let auctions: ModelAuction[] = [];
 
     if (!userId) {
       await userLogin(req).then((res) => (userId = res));
@@ -35,15 +33,6 @@ export class Payment {
 
     if (users.length === 0) {
       result.error = { message: "Usuario no Existe" };
-      return res.status(401).json(result);
-    }
-
-    await MySql.executeQuery(
-      `SELECT * FROM auction where id_auction=${auctionId} limit 1;`
-    ).then((data: any) => (auctions = data));
-
-    if (auctions.length === 0) {
-      result.error = { message: "Subasta no Existe" };
       return res.status(401).json(result);
     }
 
@@ -60,7 +49,7 @@ export class Payment {
       await MySql.executeQuery(
         `SELECT u.name, u.last_name, pay.*, v.vin, v.id_vehicle, v.model 
       FROM user u inner join payment pay on u.id_user=pay.id_user_seller inner join auction ac on pay.id_auction=ac.id_auction 
-      inner join vehicle v on ac.id_vehicle=v.id_vehicle where u.id_user=${userId} and pay.id_auction=${auctionId}`
+      inner join vehicle v on ac.id_vehicle=v.id_vehicle where u.id_user=${userId};`
       )
         .then((data: any) => {
           result.ok = true;
@@ -77,104 +66,32 @@ export class Payment {
     }
   };
 
-  getSellers = async (req: Request, res: Response) => {
+  getBuyerUserId = async (req: Request, res: Response) => {
     const result: IResponse = {
       ok: false,
     };
 
-    let userId = req.params.idUser;
-    let auctionId = req.params.idAuction;
+    let userId = req.params.id;
     let sellers: ModelPayment[] = [];
-    let auctions: ModelAuction[] = [];
 
     if (!userId) {
       await userLogin(req).then((res) => (userId = res));
     }
 
     await MySql.executeQuery(
-      `SELECT * FROM auction where id_auction=${auctionId} limit 1;`
-    ).then((data: any) => (auctions = data));
-
-    if (auctions.length === 0) {
-      result.error = { message: "Subasta no Existe" };
-      return res.status(401).json(result);
-    }
-
-    await MySql.executeQuery(
-      `SELECT * FROM payment where id_user_seller=${userId} limit 1;`
+      `SELECT * FROM payment where id_user_buyer=${userId} limit 1;`
     ).then((data: any) => (sellers = data));
 
     if (sellers.length === 0) {
-      result.error = { message: "usuario no tiene ventas" };
+      result.error = { message: "usuario no tiene compras" };
       return res.status(401).json(result);
     }
 
     try {
       await MySql.executeQuery(
         `SELECT u.name, u.last_name, pay.*, v.vin, v.id_vehicle, v.model 
-      FROM user u inner join payment pay on u.id_user=pay.id_user_seller inner join auction ac on pay.id_auction=ac.id_auction 
-      inner join vehicle v on ac.id_vehicle=v.id_vehicle where u.id_user=${userId} and pay.id_user_seller=${userId}`
-      )
-        .then((data: any) => {
-          result.ok = true;
-          result.data = data;
-        })
-        .catch((err) => {
-          result.ok = false;
-          result.error = err.sqlMessage;
-        });
-
-      res.json(result);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  getBuyerId = async (req: Request, res: Response) => {
-    const result: IResponse = {
-      ok: false,
-    };
-
-    let userId = req.params.idUser;
-    let auctionId = req.params.idAuction;
-    let buyers: ModelPayment[] = [];
-    let users: ModelUser[] = [];
-    let auctions: ModelAuction[] = [];
-
-    if (!userId) {
-      await userLogin(req).then((res) => (userId = res));
-    }
-
-    await MySql.executeQuery(
-      `SELECT * FROM user where id_user=${userId} limit 1;`
-    ).then((data: any) => (users = data));
-
-    if (users.length === 0) {
-      result.error = { message: "Usuario no Existe" };
-      return res.status(401).json(result);
-    }
-
-    await MySql.executeQuery(
-      `SELECT * FROM auction where id_auction=${auctionId} limit 1;`
-    ).then((data: any) => (auctions = data));
-
-    if (auctions.length === 0) {
-      result.error = { message: "Subasta no Existe" };
-      return res.status(401).json(result);
-    }
-
-    await MySql.executeQuery(
-      `SELECT * FROM payment where id_user_=${userId} limit 1;`
-    ).then((data: any) => (buyers = data));
-
-    if (buyers.length === 0) {
-      result.error = { message: "usuario no tiene ventas" };
-      return res.status(401).json(result);
-    }
-
-    try {
-      await MySql.executeQuery(
-        `SELECT * FROM state where id_state=${userId} limit 1`
+      FROM user u inner join payment pay on u.id_user=pay.id_user_buyer inner join auction ac on pay.id_auction=ac.id_auction 
+      inner join vehicle v on ac.id_vehicle=v.id_vehicle where u.id_user=${userId};`
       )
         .then((data: any) => {
           result.ok = true;
