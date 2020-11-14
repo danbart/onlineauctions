@@ -1,6 +1,6 @@
 import bodyParser from "body-parser";
 import cors from "cors";
-import { Request, Response } from "express";
+import expres, { Request, Response } from "express";
 import fileUpload from "express-fileupload";
 import { ValidationError } from "express-validation";
 import * as pkg from "../package.json";
@@ -8,7 +8,6 @@ import { createAdmin, createRoles } from "./lib/initialSetup";
 import MySql from "./mysql/mysql";
 import router from "./routes/router";
 import Server from "./server/server";
-import expres from "express";
 
 const server = Server.instance;
 

@@ -7,7 +7,8 @@ import { ModelAuctioned } from "../models/auctioned";
 import { ModelPhoto } from "../models/photo";
 import { ModelVehicle } from "../models/vehicle";
 import MySql from "../mysql/mysql";
-import { twominutes } from "../utils/converTimeZone";
+import { convertTimeZone } from "../utils/convertTimeZone";
+import { dayOfAuction } from "../utils/dayofauction";
 import { userLogin } from "../utils/jwt";
 import { IResponse } from "./interface/IResponse";
 
@@ -129,22 +130,13 @@ export class Auction {
       return res.status(401).json(result);
     }
 
-    !!req.body.auction_date &&
-      (auction.auction_date = moment(req.body.auction_date)
-        .format(FORMAT_DATE_TIME)
-        .toString());
-    if (!moment(auction.auction_date, FORMAT_DATE_TIME).isValid()) {
-      result.error = { message: "La fecha y hora no son validas" };
-      return res.status(401).json(result);
-    }
-    if (moment(auction.auction_date).diff(moment()) <= 0) {
-      result.error = { message: "La fecha no son validas" };
-      return res.status(401).json(result);
-    }
     !!req.body.initial_amount &&
       (auction.initial_amount = req.body.initial_amount);
     !!req.body.description && (auction.description = req.body.description);
     auction.active = moment().format(FORMAT_DATE_TIME).toString();
+    auction.auction_date = moment(dayOfAuction() + " 23:30:00")
+      .format(FORMAT_DATE_TIME)
+      .toString();
 
     try {
       await MySql.executeQuery(
@@ -339,6 +331,15 @@ export class Auction {
       return res.status(401).json(result);
     }
 
+    if (moment(auctions[0].auction_date).diff(moment()) >= 0) {
+      result.error = {
+        message:
+          "Subasta estara activa hasta " +
+          convertTimeZone(auctions[0].auction_date),
+      };
+      return res.status(401).json(result);
+    }
+
     await MySql.executeQuery(
       `SELECT v.* FROM auction au inner join vehicle v on au.id_vehicle=v.id_vehicle where au.id_auction=${auctionId} and v.id_user=${userId} limit 1;`
     ).then((data: any) => (vehicles = data));
@@ -352,15 +353,10 @@ export class Auction {
       `select * from auctioned where id_user=${userId} and cancelled is null order by created_at desc limit 1;`
     ).then((data: any) => (auctioneds = data));
 
-    console.log(moment().subtract(1, "day").calendar());
-    const gthora =
-      auctioneds.length > 0 &&
-      twominutes(moment(auctioneds[0].created_at).format(FORMAT_DATE_TIME));
-
     if (
       auctioneds.length > 0 &&
-      moment(gthora.toString()).diff(moment(), "minute") >= 0 &&
-      moment(gthora.toString()).diff(moment(), "minute") <= 2
+      moment(moment(auctioneds[0].created_at)).diff(moment(), "minute") >= 0 &&
+      moment(moment(auctioneds[0].created_at)).diff(moment(), "minute") <= 2
     ) {
       result.error = {
         message: "Tiene que esperar 2 minutos para volver a subastar",
