@@ -335,7 +335,7 @@ export class Vehicle {
       `SELECT * FROM photo where id_vehicle=${idVehicle};`
     ).then((data: any) => (photos = data));
 
-    if (photos.length <= 6) {
+    if (photos.length === 6) {
       result.error = {
         message: "Solo puede subir 6 fotografias a este vehiculo",
       };
