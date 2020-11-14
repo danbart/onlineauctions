@@ -313,6 +313,7 @@ export class Vehicle {
       ok: false,
     };
     const idVehicle = req.params.id;
+    let photos: ModelPhoto[] = [];
 
     let userId = 0;
     await userLogin(req).then((res) => (userId = res));
@@ -326,6 +327,17 @@ export class Vehicle {
     if (vehicles.length === 0) {
       result.error = {
         message: "El Vehiculo no existe o No puedes editar este vehiculo",
+      };
+      return res.status(401).json(result);
+    }
+
+    await MySql.executeQuery(
+      `SELECT * FROM photo where id_vehicle=${idVehicle};`
+    ).then((data: any) => (photos = data));
+
+    if (photos.length <= 6) {
+      result.error = {
+        message: "Solo puede subir 6 fotografias a este vehiculo",
       };
       return res.status(401).json(result);
     }
